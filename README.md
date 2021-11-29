@@ -3,4 +3,4 @@ Brandon Wei
 Justin Liang
 Stephen Farmer
 James Ramos
-Arvin Goyal
+Arvin Goya
