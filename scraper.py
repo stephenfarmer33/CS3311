@@ -2,8 +2,25 @@ import os
 # import xlrd
 import pandas as pd
 import sys
+import argparse
 
 # need xlrd version xlrd==1.2.0
+
+def command_line_parsing():
+    """
+    :return: Folder path, either given by user or default folder path
+    """
+    parser = argparse.ArgumentParser(description='Process Public Health Information for Database Dumping', prog='Database Dump')
+    parser.add_argument('-f', '--folder', help='Location of the folder containing the files to be processed. If using the default (dummy) folder, do not use this option')
+
+    args = parser.parse_args()
+    folder = args.folder
+    if folder is None:
+        folder = os.path.dirname(os.path.abspath(__file__)) + "\\dummy"
+    elif not os.path.isdir(folder):
+        print('The folder specified does not exist')
+        sys.exit()
+    return folder
 
 def valid_extension(file_name):
     """
@@ -22,7 +39,7 @@ def valid_content(file_name, file_type):
     :return: True if contents of file are valid, False otherwise
     """
 
-    if file_type in {"xlsx"}:
+    if file_type in {"xlsx", "xls", 'csv'}:
         # Open the Workbook
         workbook = pd.read_excel(file_name, header=4)
 
@@ -33,11 +50,19 @@ def valid_content(file_name, file_type):
         # Iterate through Excel sheet and check if given data matches correct data
         for i in range(0, 12):
             try:
-                if not (workbook.iat[0, i] == valid_columns[i]):
+                if not (workbook.iat[0, i] in valid_columns):
                     return False
             except IndexError:
                 return False
 
+    elif file_type in {"pdf"}:
+        #ToDO
+        hello = 1+1
+    
+    elif file_type in {"doc", "docx"}:
+        #ToDo
+        hello = 1+1
+    
     return True
 
 def classify_files(path):
@@ -54,7 +79,7 @@ def classify_files(path):
     }
 
     # get all files in path directory
-    os.chdir(os.getcwd() + "\\" + path)
+    os.chdir(path)
     file_names = next(os.walk('.'))[2]
     print(f"files in directory: {file_names}")
 
@@ -79,15 +104,8 @@ def classify_files(path):
 # New CMD Line argument main method
 # python3 scraper.py dummy
 def main():
-    abspath = os.path.abspath(__file__)
-    dname = os.path.dirname(abspath)
-    os.chdir(dname)
-    paths = sys.argv
-    print(f"paths is {paths}")
-    # os.chdir(path)
-    for path in paths[1:]:
-        classify_files(path)
-
+    folder = command_line_parsing()
+    classify_files(folder)
 
 if __name__ == "__main__":
     main()
