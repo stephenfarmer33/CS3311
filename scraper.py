@@ -54,7 +54,12 @@ def classify_files(path):
     }
 
     # get all files in path directory
-    os.chdir(os.getcwd() + "\\" + path)
+    # mac compatibility
+    if sys.platform == 'darwin':
+        slash = '/'
+    else:
+        slash = '\\'
+    os.chdir(os.getcwd() + slash + path)
     file_names = next(os.walk('.'))[2]
     print(f"files in directory: {file_names}")
 
