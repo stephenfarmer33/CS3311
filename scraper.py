@@ -1,5 +1,5 @@
 import os
-# import xlrd
+#import xlrd
 import pandas as pd
 import sys
 
@@ -40,6 +40,17 @@ def valid_content(file_name, file_type):
 
     return True
 
+def parse(file_name, file_type):
+    # Finds specific sheet in excel and prints as dataframe
+    desired_sheet = 'Work Plan'
+    if file_type in {"xlsx"}:
+        # Open the Workbook
+        xl = pd.ExcelFile(file_name)
+        # Chosse a specific sheet
+        if desired_sheet in xl.sheet_names:
+            workbook = pd.read_excel(file_name, sheet_name=desired_sheet)
+            print(workbook)
+
 def classify_files(path):
     """
     :param path: path of the directory with target files
@@ -63,16 +74,23 @@ def classify_files(path):
     file_names = next(os.walk('.'))[2]
     print(f"files in directory: {file_names}")
 
-    # classify all files in path directory
+    # classify and parse all files in path directory
     for file_name in file_names:
+        # classification
+        file_type = file_name.split(".")[1]
         if not valid_extension(file_name):
             categories[invalid_ext].append(file_name)
 
-        elif not valid_content(file_name, file_name.split(".")[1]):
+        elif not valid_content(file_name, file_type):
             categories[invalid_cont].append(file_name)
 
         else:
             categories[valid].append(file_name)
+        
+        #parsing
+        parse(file_name, file_type)
+
+    print('------------')
 
     print(f"Valid: {categories[valid]}")
     print(f"Invalid Extension: {categories[invalid_ext]}")
