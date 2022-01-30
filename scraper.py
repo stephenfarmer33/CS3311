@@ -15,8 +15,14 @@ def command_line_parsing():
 
     args = parser.parse_args()
     folder = args.folder
+    
+    if sys.platform == 'darwin':
+        slash = '/'
+    else:
+        slash = '\\'
+    
     if folder is None:
-        folder = os.path.dirname(os.path.abspath(__file__)) + "\\dummy"
+        folder = os.path.dirname(os.path.abspath(__file__)) + slash + "dummy"
     elif not os.path.isdir(folder):
         print('The folder specified does not exist')
         sys.exit()
@@ -27,7 +33,7 @@ def valid_extension(file_name):
     :param file_name: name of the file
     :return: True if file has a valid extenstion, false otherwise
     """
-    valid_ext = {'pdf', 'xlsx', 'docx', 'doc', 'csv', 'xls'}
+    valid_ext = {'pdf', 'xlsx', 'docx', 'doc', 'xls'}
     ext = file_name.split(".")
     return len(ext) == 2 and ext[1] in valid_ext
 
@@ -39,9 +45,12 @@ def valid_content(file_name, file_type):
     :return: True if contents of file are valid, False otherwise
     """
 
-    if file_type in {"xlsx", "xls", 'csv'}:
+    if file_type in {"xlsx", "xls"}:
         # Open the Workbook
-        workbook = pd.read_excel(file_name, header=4)
+        try:
+            workbook = pd.read_excel(file_name, sheet_name="Work Plan", header=4)
+        except ValueError:
+            return False
 
         # Valid Columns for the Data
         valid_columns = ["Project Title", "Activity Title", "Strategy", "Activity", "Activity Description", "Output",
@@ -74,7 +83,7 @@ def parse(file_name, file_type):
         # Chosse a specific sheet
         if desired_sheet in xl.sheet_names:
             workbook = pd.read_excel(file_name, sheet_name=desired_sheet)
-            print(workbook)
+            #print(workbook)
 
 def classify_files(path):
     """
@@ -90,14 +99,8 @@ def classify_files(path):
     }
 
     # get all files in path directory
-    os.chdir(path)
-    # mac compatibility
-    if sys.platform == 'darwin':
-        slash = '/'
-    else:
-        slash = '\\'
-    os.chdir(os.getcwd() + slash + path)
-    file_names = next(os.walk('.'))[2]
+    #os.chdir(path)
+    file_names = next(os.walk(path))[2]
     print(f"files in directory: {file_names}")
 
     # classify and parse all files in path directory
@@ -107,14 +110,14 @@ def classify_files(path):
         if not valid_extension(file_name):
             categories[invalid_ext].append(file_name)
 
-        elif not valid_content(file_name, file_type):
+        elif not valid_content(os.path.join(path, file_name), file_type):
             categories[invalid_cont].append(file_name)
 
         else:
             categories[valid].append(file_name)
         
         #parsing
-        parse(file_name, file_type)
+        #parse(os.path.join(path, file_name), file_type)
 
     print('------------')
 
