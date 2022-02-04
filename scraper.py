@@ -36,6 +36,51 @@ def valid_extension(file_name):
     ext = file_name.split(".")
     return len(ext) == 2 and ext[1] in valid_ext
 
+def parse_activities(file_name, file_type):
+    """
+    :param file_name: file being parsed
+    :param file_type: file type being parsed
+    :return: dictionary of activities
+    """
+    acts = {}
+    if file_type in {"xlsx", "xls"}:
+        # Open the Workbook
+        try:
+            workbook = pd.read_excel(file_name, sheet_name="Work Plan", header=4)
+        except ValueError:
+            return False
+
+        # Find header row start
+        header_row, num_rows, num_cols = 0, len(workbook), len(workbook.columns)
+        for row in range(0, num_rows):
+            for col in range(0, num_cols):
+                if workbook.iat[row, col] == "Project Title":
+                    header_row = row
+                    break
+
+        print(f"header row is {header_row}")
+        # map activity feature
+        header_map = {}
+        headers = ["Activity Title", "Activity", "Activity Description", "Timeline", "Status", "Successes", "Challenges", "CDC Program Support Needed"]
+        for col in range(0, num_cols):
+            curr_header = workbook.iat[header_row, col]
+            if curr_header in headers:
+                header_map[curr_header] = col
+
+        print(f"header map is {header_map}")
+
+
+        # find all activities
+        act_col = header_map["Activity Title"]
+        for row in range(header_row + 1, num_rows):
+            curr_act = workbook.iat[row, act_col]
+            print(f"activity: {curr_act}")
+            # curr_act_data = get_activity_features()
+
+
+
+
+
 
 def valid_content(file_name, file_type):
     """
@@ -58,15 +103,15 @@ def valid_content(file_name, file_type):
         # Iterate through Excel sheet and check if given data matches correct data
         for i in range(0, 12):
             try:
-                if not (workbook.iat[0, i] in valid_columns):
-                    return False
+                print(workbook.iat[0, i])
+
             except IndexError:
                 return False
 
     elif file_type in {"pdf"}:
         #ToDO
         hello = 1+1
-    
+
     elif file_type in {"doc", "docx"}:
         #ToDo
         hello = 1+1
@@ -106,14 +151,17 @@ def classify_files(path):
     for file_name in file_names:
         # classification
         file_type = file_name.split(".")[1]
-        if not valid_extension(file_name):
-            categories[invalid_ext].append(file_name)
 
-        elif not valid_content(os.path.join(path, file_name), file_type):
-            categories[invalid_cont].append(file_name)
+        parse_activities(os.path.join(path, file_name), file_type)
 
-        else:
-            categories[valid].append(file_name)
+        # if not valid_extension(file_name):
+        #     categories[invalid_ext].append(file_name)
+        #
+        # elif not valid_content(os.path.join(path, file_name), file_type):
+        #     categories[invalid_cont].append(file_name)
+        #
+        # else:
+        #     categories[valid].append(file_name)
         
         #parsing
         #parse(os.path.join(path, file_name), file_type)
