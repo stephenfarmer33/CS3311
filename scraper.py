@@ -128,7 +128,7 @@ def classify_files(path):
 
 
 # New CMD Line argument main method
-# python3 scraper.py dummy
+# python3 scraper.py -f dummy
 def main():
     folder = command_line_parsing()
     classify_files(folder)
