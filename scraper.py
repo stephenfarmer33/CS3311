@@ -3,29 +3,33 @@ import pandas as pd
 import sys
 import argparse
 
+
 # need xlrd version xlrd==1.2.0
 
 def command_line_parsing():
     """
     :return: Folder path, either given by user or default folder path
     """
-    parser = argparse.ArgumentParser(description='Process Public Health Information for Database Dumping', prog='Database Dump')
-    parser.add_argument('-f', '--folder', help='Location of the folder containing the files to be processed. If using the default (dummy) folder, do not use this option')
+    parser = argparse.ArgumentParser(description='Process Public Health Information for Database Dumping',
+                                     prog='Database Dump')
+    parser.add_argument('-f', '--folder',
+                        help='Location of the folder containing the files to be processed. If using the default (dummy) folder, do not use this option')
 
     args = parser.parse_args()
     folder = args.folder
-    
+
     if sys.platform == 'darwin':
         slash = '/'
     else:
         slash = '\\'
-    
+
     if folder is None:
         folder = os.path.dirname(os.path.abspath(__file__)) + slash + "dummy"
     elif not os.path.isdir(folder):
         print('The folder specified does not exist')
         sys.exit()
     return folder
+
 
 def valid_extension(file_name):
     """
@@ -35,6 +39,7 @@ def valid_extension(file_name):
     valid_ext = {'pdf', 'xlsx', 'docx', 'doc', 'xls'}
     ext = file_name.split(".")
     return len(ext) == 2 and ext[1] in valid_ext
+
 
 def parse_activities(file_name, file_type):
     """
@@ -61,7 +66,8 @@ def parse_activities(file_name, file_type):
         print(f"header row is {header_row}")
         # map activity feature
         header_map = {}
-        headers = ["Activity Title", "Activity", "Activity Description", "Timeline", "Status", "Successes", "Challenges", "CDC Program Support Needed"]
+        headers = ["Project Title", "Activity Title", "Activity", "Activity Description", "Timeline", "Status",
+                   "Successes", "Challenges", "CDC Program Support Needed"]
         for col in range(0, num_cols):
             curr_header = workbook.iat[header_row, col]
             if curr_header in headers:
@@ -69,17 +75,54 @@ def parse_activities(file_name, file_type):
 
         print(f"header map is {header_map}")
 
+        map_acts_to_project(workbook, header_map, header_row)
 
         # find all activities
         act_col = header_map["Activity Title"]
         for row in range(header_row + 1, num_rows):
             curr_act = workbook.iat[row, act_col]
-            print(f"activity: {curr_act}")
+            # print(f"activity: {curr_act}")
+            acts[curr_act] = row
             # curr_act_data = get_activity_features()
 
 
+def map_acts_to_project(workbook, header_map, header_row):
+    """
+    :param workbook: current excel document being read
+    :param header_map: dict mapping header names -> col indexes
+    :param: header_row: row index of headers
+    :return: dict projects mapping project name to list of activities associated with project
+    """
 
+    projects = {}
+    curr_acts = []
+    curr_project = None
+    for row in range(header_row + 1, len(workbook)):
+        curr_cell = workbook.iat[row, header_map["Project Title"]]
+        print(f"curr cell: {curr_cell} and type is {type(curr_cell)}")
+        if not isinstance(curr_cell, float) and curr_project != curr_cell:
+            print(f"new project {curr_cell} detected")
+            # new project starts in this row, fill last project's activities
+            if curr_project is not None:
+                projects[curr_project] = curr_acts[:]
+                print(f"activities {curr_acts} appended to project: {curr_project}")
+                print(f"project {curr_project} added to projects!")
+            curr_project = curr_cell
+            curr_acts = []
 
+        act = workbook.iat[row, header_map["Activity Title"]]
+        curr_acts.append(act)
+
+    # add last project
+    if curr_project not in projects:
+        projects[curr_project] = curr_acts[:]
+        print(f"activities {curr_acts} appended to project: {curr_project}")
+        print(f"project {curr_project} added to projects!")
+
+    for project in projects.keys():
+        print(f"{project} : {projects[project]}")
+
+    return projects
 
 
 def valid_content(file_name, file_type):
@@ -109,14 +152,15 @@ def valid_content(file_name, file_type):
                 return False
 
     elif file_type in {"pdf"}:
-        #ToDO
-        hello = 1+1
+        # ToDO
+        hello = 1 + 1
 
     elif file_type in {"doc", "docx"}:
-        #ToDo
-        hello = 1+1
-    
+        # ToDo
+        hello = 1 + 1
+
     return True
+
 
 def parse(file_name, file_type):
     # Finds specific sheet in excel and prints as dataframe
@@ -127,7 +171,8 @@ def parse(file_name, file_type):
         # Chosse a specific sheet
         if desired_sheet in xl.sheet_names:
             workbook = pd.read_excel(file_name, sheet_name=desired_sheet)
-            #print(workbook)
+            # print(workbook)
+
 
 def classify_files(path):
     """
@@ -143,7 +188,7 @@ def classify_files(path):
     }
 
     # get all files in path directory
-    #os.chdir(path)
+    # os.chdir(path)
     file_names = next(os.walk(path))[2]
     print(f"files in directory: {file_names}")
 
@@ -162,9 +207,9 @@ def classify_files(path):
         #
         # else:
         #     categories[valid].append(file_name)
-        
-        #parsing
-        #parse(os.path.join(path, file_name), file_type)
+
+        # parsing
+        # parse(os.path.join(path, file_name), file_type)
 
     print('------------')
 
@@ -180,6 +225,7 @@ def classify_files(path):
 def main():
     folder = command_line_parsing()
     classify_files(folder)
+
 
 if __name__ == "__main__":
     main()
