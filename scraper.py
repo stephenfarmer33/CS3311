@@ -10,22 +10,33 @@ def command_line_parsing():
     :return: Folder path, either given by user or default folder path
     """
     parser = argparse.ArgumentParser(description='Process Public Health Information for Database Dumping', prog='Database Dump')
-    parser.add_argument('-f', '--folder', help='Location of the folder containing the files to be processed. If using the default (dummy) folder, do not use this option')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-f', '--folder', help='Location of the folder containing the files to be processed.')
+    group.add_argument('-fi', '--file', help='Singular file to be processed. Please put full (absolute) path of file')
+    #parser.add_argument('-f', '--folder', help='Location of the folder containing the files to be processed. If using the default (dummy) folder, do not use this option')
+    #parser.add_argument('-fi', '--file', help='Singular file to be processed')
 
     args = parser.parse_args()
     folder = args.folder
+    file = args.file
     
     if sys.platform == 'darwin':
         slash = '/'
     else:
         slash = '\\'
     
-    if folder is None:
-        folder = os.path.dirname(os.path.abspath(__file__)) + slash + "dummy"
-    elif not os.path.isdir(folder):
-        print('The folder specified does not exist')
+    #if folder is None:
+    #    folder = os.path.dirname(os.path.abspath(__file__)) + slash + "dummy"
+    #elif not os.path.isdir(folder):
+    #    print('The folder specified does not exist')
+    #    sys.exit()
+    if folder is None and os.path.isfile(file):
+        return file
+    elif (os.path.isdir(folder)):
+        return folder
+    else:
+        print("Path specified does not exist")
         sys.exit()
-    return folder
 
 def valid_extension(file_name):
     """
@@ -144,15 +155,28 @@ def classify_files(path):
 
     # get all files in path directory
     #os.chdir(path)
-    file_names = next(os.walk(path))[2]
-    print(f"files in directory: {file_names}")
+    if(os.path.isdir(path)):
+        file_names = next(os.walk(path))[2]
+        print(f"files in directory: {file_names}")
+        for file_name in file_names:
+            file_type = file_name.split(".")[1]
+            parse_activities(os.path.join(path, file_name), file_type)
+    else:
+        try:
+            relative_path = path.rsplit("\\", 1)[0]
+            file_name = path.rsplit("\\", 1)[1]
+        except:
+            relative_path = path.rsplit("//", 1)[0]
+            file_name = path.rsplit("//", 1)[1]
+        file_type = file_name.split(".")[1]
+        parse_activities(relative_path, file_type)
 
     # classify and parse all files in path directory
-    for file_name in file_names:
+    #for file_name in file_names:
         # classification
-        file_type = file_name.split(".")[1]
+    #    file_type = file_name.split(".")[1]
 
-        parse_activities(os.path.join(path, file_name), file_type)
+    #    parse_activities(os.path.join(path, file_name), file_type)
 
         # if not valid_extension(file_name):
         #     categories[invalid_ext].append(file_name)
@@ -178,8 +202,8 @@ def classify_files(path):
 # New CMD Line argument main method
 # python3 scraper.py dummy
 def main():
-    folder = command_line_parsing()
-    classify_files(folder)
+    path = command_line_parsing()
+    classify_files(path)
 
 if __name__ == "__main__":
     main()
