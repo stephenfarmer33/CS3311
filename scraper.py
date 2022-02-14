@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import sys
 import argparse
-
+import utils
 
 # need xlrd version xlrd==1.2.0
 
@@ -68,6 +68,11 @@ def parse_activities(file_name, file_type):
         header_map = {}
         headers = ["Project Title", "Activity Title", "Activity", "Activity Description", "Timeline", "Status",
                    "Successes", "Challenges", "CDC Program Support Needed"]
+
+        # features each excel doc is expected to have
+        core_features = ["Activity Title", "Activity", "Activity Description", "Timeline"]
+
+
         for col in range(0, num_cols):
             curr_header = workbook.iat[header_row, col]
             if curr_header in headers:
@@ -75,15 +80,19 @@ def parse_activities(file_name, file_type):
 
         print(f"header map is {header_map}")
 
-        map_acts_to_project(workbook, header_map, header_row)
+        # map_acts_to_project(workbook, header_map, header_row)
 
         # find all activities
         act_col = header_map["Activity Title"]
         for row in range(header_row + 1, num_rows):
-            curr_act = workbook.iat[row, act_col]
-            # print(f"activity: {curr_act}")
-            acts[curr_act] = row
-            # curr_act_data = get_activity_features()
+            curr_act = utils.init_act_obj()
+            curr_act_name = workbook.iat[row, act_col]
+            curr_act["name"] = curr_act_name
+            curr_act["row"] = row
+
+            utils.add_features(workbook, curr_act, core_features, header_map)
+            print(curr_act)
+            acts[curr_act_name] = curr_act
 
 
 def map_acts_to_project(workbook, header_map, header_row):
