@@ -8,7 +8,7 @@ The project was made for Georgia Tech's junior design program, and its members a
 # Install instructions
 
 1. Install python3 and pip
-2. Run "pip install requirements.txt"
+2. Run "pip install -f requirements.txt"
 3. Run to ensure installation is complete"python3 scraper.py -f dummy"
 
 # Project details
