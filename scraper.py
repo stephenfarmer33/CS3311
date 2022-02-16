@@ -327,14 +327,17 @@ def classify_files(path):
             file_type = file_name.split(".")[1]
             parse_activities(os.path.join(path, file_name), file_type)
     else:
-        try:
-            relative_path = path.rsplit("\\", 1)[0]
-            file_name = path.rsplit("\\", 1)[1]
-        except:
-            relative_path = path.rsplit("//", 1)[0]
-            file_name = path.rsplit("//", 1)[1]
-        file_type = file_name.split(".")[1]
-        parse_activities(relative_path, file_type)
+        # try:
+        #     print(path)
+        #     relative_path = path.rsplit("\\", 1)[0]
+        #     file_name = path.rsplit("\\", 1)[1]
+        # except:
+        #     relative_path = path.rsplit("/", 1)[0]
+        #     print(relative_path)
+        #     file_name = path.rsplit("/", 1)[1]
+        #     print(file_name)
+        file_type = path.split(".")[1]
+        parse_activities(path, file_type)
     
     # # get all files in path directory
     # # os.chdir(path)
