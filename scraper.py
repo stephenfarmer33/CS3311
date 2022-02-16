@@ -3,32 +3,154 @@ import pandas as pd
 import sys
 import argparse
 import utils
+from tkinter import *
+from tkinter.ttk import *
+#from tkinter.filedialog import askopenfile 
+from tkinter import filedialog
+import time
+import threading
 
 # need xlrd version xlrd==1.2.0
+
+def main_screen():
+    data = Tk()
+    data.title('Data Extraction')
+    data.geometry('400x200')
+    #data.state('zoomed')
+    return data
+
+def extract_file(file, success, error):
+    success.grid_remove()
+    error.grid_remove()
+    file_path = filedialog.askopenfile(mode='r', filetypes=[('Pdf file', '*.pdf'), ('Excel File', '*.xlsx'), ('Word File', '*.docx'), ('Word File', '*.doc'), ('Excel File', '*.xls')])
+    if file_path is not None:
+        file.set(file_path.name)
+
+def extract_folder(folder, success, error):
+    success.grid_remove()
+    error.grid_remove()
+    folder_path = filedialog.askdirectory()
+    if folder_path is not None:
+        folder.set(folder_path)
+
+def upload(data, file, folder, error, success):
+    file_path = file.get()
+    folder_path = folder.get()
+    if(folder_path == "" and file_path == ""):
+        error.grid()
+        return
+    
+    progress_bar = Progressbar(data, 
+                                orient=HORIZONTAL,
+                                length=300,
+                                mode='determinate')
+    progress_bar.grid(row=4, columnspan=3, pady=20)
+    if(folder_path != ""):
+        folder_thread = threading.Thread(target=classify_files, args=(folder_path,))
+        folder_thread.start()
+        print("Passing Folder")
+    
+    else:
+        file_thread = threading.Thread(target=classify_files, args=(file_path,))
+        print(file_path)
+        file_thread.start()
+        print("Passing File")
+
+    for i in range(5):
+        data.update_idletasks()
+        progress_bar['value'] += 20
+        time.sleep(1)
+    progress_bar.destroy()
+    file.set("")
+    folder.set("")
+    success.grid()
+    
+
+def GUI(data):
+    file = StringVar()
+    folder = StringVar()
+    
+    success = Label(data, text="Succesful Upload!", foreground='green')
+    success.grid(row=4, columnspan=3, pady=10)
+    success.grid_remove()
+    
+    error = Label(data, text="Error! No File or Folder Chosen!", foreground='red')
+    error.grid(row=4, columnspan=3, pady=10)
+    error.grid_remove()
+    
+    choose_upload = Label(data,
+                         text='Choose One: File or Folder. If both are chosen, defaults to folder.')
+    choose_upload.grid(row=0, column=0, padx=20)
+
+    file_upload_button = Button(data,
+                                text='Choose File',
+                                command=lambda:extract_file(file, success, error))
+    file_upload_button.grid(row=1, column=0)
+
+    folder_upload_button = Button(data,
+                                text='Choose Folder',
+                                command=lambda:extract_folder(folder, success, error))
+    folder_upload_button.grid(row=2, column=0)
+    
+    # file_upload = Label(data,
+    #                     text='Upload File in Valid Format')
+    # file_upload.grid(row=0, column=0, padx=10)
+
+    # file_upload_button = Button(data,
+    #                             text='Choose File',
+    #                             command=lambda:extract_file(file))
+    # file_upload_button.grid(row=0, column=1)
+
+    # folder_upload = Label(data,
+    #                     text='Upload Folder')
+    # folder_upload.grid(row=1, column=0, padx=10)
+
+    # folder_upload_button = Button(data,
+    #                             text='Choose File',
+    #                             command=lambda:extract_folder(folder))
+    # folder_upload_button.grid(row=1, column=1)
+
+    
+    
+    upload_button = Button(data,
+                            text="Upload",
+                            command=lambda:upload(data, file, folder, error, success))
+    upload_button.grid(row=3, columnspan=2, pady=10)
+
+
 
 def command_line_parsing():
     """
     :return: Folder path, either given by user or default folder path
     """
-    parser = argparse.ArgumentParser(description='Process Public Health Information for Database Dumping',
-                                     prog='Database Dump')
-    parser.add_argument('-f', '--folder',
-                        help='Location of the folder containing the files to be processed. If using the default (dummy) folder, do not use this option')
+    parser = argparse.ArgumentParser(description='Process Public Health Information for Database Dumping', prog='Database Dump')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-f', '--folder', help='Location of the folder containing the files to be processed.')
+    group.add_argument('-fi', '--file', help='Singular file to be processed. Please put full (absolute) path of file')
+    #parser.add_argument('-f', '--folder', help='Location of the folder containing the files to be processed. If using the default (dummy) folder, do not use this option')
+    #parser.add_argument('-fi', '--file', help='Singular file to be processed')
 
     args = parser.parse_args()
     folder = args.folder
-
+    file = args.file
+    
     if sys.platform == 'darwin':
         slash = '/'
     else:
         slash = '\\'
-
-    if folder is None:
-        folder = os.path.dirname(os.path.abspath(__file__)) + slash + "dummy"
-    elif not os.path.isdir(folder):
-        print('The folder specified does not exist')
+    
+    #if folder is None:
+    #    folder = os.path.dirname(os.path.abspath(__file__)) + slash + "dummy"
+    #elif not os.path.isdir(folder):
+    #    print('The folder specified does not exist')
+    #    sys.exit()
+    if folder is None and os.path.isfile(file):
+        return file
+    elif (os.path.isdir(folder)):
+        return folder
+    else:
+        print("Path specified does not exist")
         sys.exit()
-    return folder
 
 
 def valid_extension(file_name):
@@ -197,16 +319,37 @@ def classify_files(path):
     }
 
     # get all files in path directory
-    # os.chdir(path)
-    file_names = next(os.walk(path))[2]
-    print(f"files in directory: {file_names}")
+    #os.chdir(path)
+    if(os.path.isdir(path)):
+        file_names = next(os.walk(path))[2]
+        print(f"files in directory: {file_names}")
+        for file_name in file_names:
+            file_type = file_name.split(".")[1]
+            parse_activities(os.path.join(path, file_name), file_type)
+    else:
+        # try:
+        #     print(path)
+        #     relative_path = path.rsplit("\\", 1)[0]
+        #     file_name = path.rsplit("\\", 1)[1]
+        # except:
+        #     relative_path = path.rsplit("/", 1)[0]
+        #     print(relative_path)
+        #     file_name = path.rsplit("/", 1)[1]
+        #     print(file_name)
+        file_type = path.split(".")[1]
+        parse_activities(path, file_type)
+    
+    # # get all files in path directory
+    # # os.chdir(path)
+    # file_names = next(os.walk(path))[2]
+    # print(f"files in directory: {file_names}")
 
-    # classify and parse all files in path directory
-    for file_name in file_names:
-        # classification
-        file_type = file_name.split(".")[1]
+    # # classify and parse all files in path directory
+    # for file_name in file_names:
+    #     # classification
+    #     file_type = file_name.split(".")[1]
 
-        parse_activities(os.path.join(path, file_name), file_type)
+    #     parse_activities(os.path.join(path, file_name), file_type)
 
         # if not valid_extension(file_name):
         #     categories[invalid_ext].append(file_name)
@@ -232,8 +375,11 @@ def classify_files(path):
 # New CMD Line argument main method
 # python3 scraper.py -f dummy
 def main():
-    folder = command_line_parsing()
-    classify_files(folder)
+    data = main_screen()
+    GUI(data)
+    data.mainloop()
+    #folder = command_line_parsing()
+    #classify_files(folder)
 
 
 if __name__ == "__main__":
