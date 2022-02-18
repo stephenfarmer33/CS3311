@@ -47,16 +47,23 @@ def connect():
     print('Database connection:', cnx)
     cursor = cnx.cursor()
     
-
+# insert multiple rows?
 def insert(table, data):
     if table in insert_query:
         try:
-            cursor.execute(insert_query[table], data)
-            cnx.commit()
+            if type(data) == data:
+                cursor.execute(insert_query[table], data)
+                cnx.commit()
+            elif type(data) == list:
+                cursor.executemany(insert_query[table], data)
+                cnx.commit()
+            else:
+                print('Invalid data type inserted')
         except mysql.connector.Error as err:
             print("Insert failed: {}".format(err))
     else:
         print('Invalid table selected for insertion')
+    
 
 def remove(table, data):
     pass
