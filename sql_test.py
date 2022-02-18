@@ -4,15 +4,14 @@ import sql_connection
 table = 'projects'
 
 # specify data you want to query with
-data = {
-    'ProjectID': 112, # make sure primary key isn't duplicated!!
+data = [{
+    'ProjectID': 124, # make sure primary key isn't duplicated!!
     'Project': 'project name',
     'State': 'Georgia',
     'Budget Period': 'budget period dates',
     'Reporting Period': 'reporting period dates'
-}
+}]
 
-# list of dictionaries
 data_many = [{
     'ProjectID': 120, # make sure primary key isn't duplicated!!
     'Project': 'project name',
@@ -28,7 +27,7 @@ data_many = [{
 }]
 
 # insert data into db with given table and data
-sql_connection.insert(table, data_many)
+sql_connection.insert(table, data)
 
 # close the connection
 sql_connection.close_connection()
