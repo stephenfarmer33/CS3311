@@ -158,7 +158,7 @@ def valid_extension(file_name):
     :param file_name: name of the file
     :return: True if file has a valid extenstion, false otherwise
     """
-    valid_ext = {'pdf', 'xlsx', 'docx', 'doc', 'xls'}
+    valid_ext = {'pdf', 'xlsx', 'docx', 'doc', 'xls', 'xlsb'}
     ext = file_name.split(".")
     return len(ext) == 2 and ext[1] in valid_ext
 
