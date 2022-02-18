@@ -23,7 +23,7 @@ def add_features(workbook, act, features, header_map):
             act_feature_map[feature] = content
 
         except KeyError:
-            print(f"header feature {feature} not found in excel doc")
+            act_feature_map[feature] = None
 
     return act
 
@@ -40,7 +40,6 @@ def fill_nan_values(workbook, row_start):
             curr_cell = workbook.iat[row, col]
             if isinstance(curr_cell, float):
                 workbook.iat[row, col] = curr_val
-                print(workbook.iat[row, col])
             elif curr_val != curr_cell:
                 curr_val = curr_cell
 
