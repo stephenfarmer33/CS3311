@@ -22,7 +22,7 @@ def main_screen():
 def extract_file(file, success, error):
     success.grid_remove()
     error.grid_remove()
-    file_path = filedialog.askopenfile(mode='r', filetypes=[('Pdf file', '*.pdf'), ('Excel File', '*.xlsx'), ('Word File', '*.docx'), ('Word File', '*.doc'), ('Excel File', '*.xls')])
+    file_path = filedialog.askopenfile(mode='r', filetypes=[('All Files', '*.*'), ('Pdf file', '*.pdf'), ('Excel File', '*.xlsx'), ('Word File', '*.docx'), ('Word File', '*.doc'), ('Excel File', '*.xls'), ('Excel File', '*.xlsb')])
     if file_path is not None:
         file.set(file_path.name)
 
