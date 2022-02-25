@@ -3,83 +3,79 @@ from mysql.connector import errorcode
 
 # how to run:
 # 1. run CS3311.sql in mysql workbench
+#
 # 2. create a custom user with the credentials:
-#   user: 'cs3311_admin'
-#   password: 'password'
-#   administrative roles: DBA
-#   schema privileges: add entry -> schema 'CS 3311', Select "ALL" privileges
+#    user: 'cs3311_admin'
+#    password: 'password'
+#    administrative roles: DBA
+#    schema privileges: add entry -> schema 'CS 3311', Select "ALL" privileges
+#
+# 3. import and run sql_connection in another file.
+#    example code found at sql_test.py
 
-# database connection config info
 config = {
     'user': 'cs3311_admin',
     'password': 'password',
     'host': '127.0.0.1',
     'database': 'CS3311'
 }
+cnx = None
+cursor = None
 
-
-class sql_connection:
-    def __init__(self):
-        self.config = {
-            'user': 'cs3311_admin',
-            'password': 'password',
-            'host': '127.0.0.1',
-            'database': 'CS3311'
-        }
-        self.cnx = None
-        self.cursor = None
-
-    def connect(self):
-        try:
-            self.cnx = mysql.connector.connect(**self.config)
-        except mysql.connector.Error as err:
-            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                print("Something is wrong with your user name or password")
-            elif err.errno == errorcode.ER_BAD_DB_ERROR:
-                print("Database does not exist")
-            else:
-                print(err)
-
-        print('Database connection:', self.cnx)
-        self.cursor = self.cnx.cursor()
-        
-
-    def insert(self, table, data):
-        if table == 'projects':
-            query = ("INSERT INTO projects "
-               "(ProjectID, Project, State, Budget_Period, Reporting_Period) "
-               "VALUES (%(ProjectID)s, %(Project)s, %(State)s, %(Budget Period)s, %(Reporting Period)s);")
-        elif table == 'activities':
-            pass
-        if query:
-            self.cursor.execute(query, data)
-            self.cnx.commit()
-            print('Insert executed on table:', table, '\nData:', data)
-        else:
-            print('Invalid table selected for insertion')
-
-
-    def close_connection(self):
-        if self.cnx:
-            print('Closed connection:', self.cnx)
-            self.cnx.close()
-            self.cursor.close()
-        else:
-            print('No connection to close')
-
-
-# example usage
-sql = sql_connection()
-sql.connect()
-
-table = 'projects'
-data = {
-    'ProjectID': 101,
-    'Project': 'project name',
-    'State': 'Georgia',
-    'Budget Period': 'budget period dates',
-    'Reporting Period': 'reporting period dates'
+insert_query = {
+    'projects': ("INSERT INTO projects "
+            "(ProjectID, Project, State, Budget_Period, Reporting_Period) "
+            "VALUES (%(ProjectID)s, %(Project)s, %(State)s, %(Budget Period)s, %(Reporting Period)s);"),
+    'activities': ("INSERT INTO projects "
+            "(ID, Activity, Description, Outcome, Output, Timeline, Statistics, Status, Successes, Challenges, CDC_Support_Needed) "
+            "VALUES (%(ID)s, %(Activity)s, %(Description)s, %(Outcome)s, %(Output)s, %(Timeline)s, %(Statistics)s, %(Status)s, %(Successes)s, %(Challenges)s, %(CDC_Support_Needed)s);")
 }
-sql.insert(table, data)
 
-sql.close_connection()
+def connect():
+    global cnx
+    global cursor
+    try:
+        cnx = mysql.connector.connect(**config)
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+        else:
+            print(err)
+
+    print('Database connection:', cnx)
+    cursor = cnx.cursor()
+    
+# insert multiple rows?
+def insert(table, data):
+    """
+    Insert data into table in database
+    :param table: str table to insert
+    :param data: list of dict of data to insert 
+    """
+    if table in insert_query:
+        try:
+            cursor.executemany(insert_query[table], data)
+            cnx.commit()
+        except mysql.connector.Error as err:
+            print("Insert failed: {}".format(err))
+    else:
+        print('Invalid table selected for insertion')
+
+def query(table, query, data):
+    pass
+    
+
+def remove(table, data):
+    pass
+
+def close_connection():
+    if cnx:
+        print('Closed connection:', cnx)
+        cnx.close()
+        cursor.close()
+    else:
+        print('No connection to close')
+
+connect()
