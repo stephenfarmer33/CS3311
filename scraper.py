@@ -5,10 +5,11 @@ import argparse
 import utils
 from tkinter import *
 from tkinter.ttk import *
-#from tkinter.filedialog import askopenfile 
+# from tkinter.filedialog import askopenfile
 from tkinter import filedialog
 import time
 import threading
+
 
 # need xlrd version xlrd==1.2.0
 
@@ -16,15 +17,20 @@ def main_screen():
     data = Tk()
     data.title('Data Extraction')
     data.geometry('400x200')
-    #data.state('zoomed')
+    # data.state('zoomed')
     return data
+
 
 def extract_file(file, success, error):
     success.grid_remove()
     error.grid_remove()
-    file_path = filedialog.askopenfile(mode='r', filetypes=[('All Files', '*.*'), ('Pdf file', '*.pdf'), ('Excel File', '*.xlsx'), ('Word File', '*.docx'), ('Word File', '*.doc'), ('Excel File', '*.xls'), ('Excel File', '*.xlsb')])
+    file_path = filedialog.askopenfile(mode='r',
+                                       filetypes=[('All Files', '*.*'), ('Pdf file', '*.pdf'), ('Excel File', '*.xlsx'),
+                                                  ('Word File', '*.docx'), ('Word File', '*.doc'),
+                                                  ('Excel File', '*.xls'), ('Excel File', '*.xlsb')])
     if file_path is not None:
         file.set(file_path.name)
+
 
 def extract_folder(folder, success, error):
     success.grid_remove()
@@ -33,23 +39,24 @@ def extract_folder(folder, success, error):
     if folder_path is not None:
         folder.set(folder_path)
 
+
 def upload(data, file, folder, error, success):
     file_path = file.get()
     folder_path = folder.get()
-    if(folder_path == "" and file_path == ""):
+    if (folder_path == "" and file_path == ""):
         error.grid()
         return
-    
-    progress_bar = Progressbar(data, 
-                                orient=HORIZONTAL,
-                                length=300,
-                                mode='determinate')
+
+    progress_bar = Progressbar(data,
+                               orient=HORIZONTAL,
+                               length=300,
+                               mode='determinate')
     progress_bar.grid(row=4, columnspan=3, pady=20)
-    if(folder_path != ""):
+    if (folder_path != ""):
         folder_thread = threading.Thread(target=classify_files, args=(folder_path,))
         folder_thread.start()
         print("Passing Folder")
-    
+
     else:
         file_thread = threading.Thread(target=classify_files, args=(file_path,))
         print(file_path)
@@ -64,57 +71,56 @@ def upload(data, file, folder, error, success):
     file.set("")
     folder.set("")
     success.grid()
-    
+
 
 def GUI(data):
     file = StringVar()
     folder = StringVar()
-    
+
     success = Label(data, text="Succesful Upload!", foreground='green')
     success.grid(row=4, columnspan=3, pady=10)
     success.grid_remove()
-    
+
     error = Label(data, text="Error! No File or Folder Chosen!", foreground='red')
     error.grid(row=4, columnspan=3, pady=10)
     error.grid_remove()
-    
+
     choose_upload = Label(data,
-                         text='Choose One: File or Folder. If both are chosen, defaults to folder.')
+                          text='Choose One: File or Folder. If both are chosen, defaults to folder.')
     choose_upload.grid(row=0, column=0, padx=20)
 
     file_upload_button = Button(data,
                                 text='Choose File',
-                                command=lambda:extract_file(file, success, error))
+                                command=lambda: extract_file(file, success, error))
     file_upload_button.grid(row=1, column=0)
 
     folder_upload_button = Button(data,
-                                text='Choose Folder',
-                                command=lambda:extract_folder(folder, success, error))
+                                  text='Choose Folder',
+                                  command=lambda: extract_folder(folder, success, error))
     folder_upload_button.grid(row=2, column=0)
 
-    
     upload_button = Button(data,
-                            text="Upload",
-                            command=lambda:upload(data, file, folder, error, success))
+                           text="Upload",
+                           command=lambda: upload(data, file, folder, error, success))
     upload_button.grid(row=3, columnspan=2, pady=10)
-
 
 
 def command_line_parsing():
     """
     :return: Folder path, either given by user or default folder path
     """
-    parser = argparse.ArgumentParser(description='Process Public Health Information for Database Dumping', prog='Database Dump')
+    parser = argparse.ArgumentParser(description='Process Public Health Information for Database Dumping',
+                                     prog='Database Dump')
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-f', '--folder', help='Location of the folder containing the files to be processed.')
     group.add_argument('-fi', '--file', help='Singular file to be processed. Please put full (absolute) path of file')
-    #parser.add_argument('-f', '--folder', help='Location of the folder containing the files to be processed. If using the default (dummy) folder, do not use this option')
-    #parser.add_argument('-fi', '--file', help='Singular file to be processed')
+    # parser.add_argument('-f', '--folder', help='Location of the folder containing the files to be processed. If using the default (dummy) folder, do not use this option')
+    # parser.add_argument('-fi', '--file', help='Singular file to be processed')
 
     args = parser.parse_args()
     folder = args.folder
     file = args.file
-    
+
     if sys.platform == 'darwin':
         slash = '/'
     else:
@@ -145,18 +151,18 @@ def parse_activities(file_name, file_type):
     :param file_type: file type being parsed
     :return: dictionary of activities
     """
-    print("start parsing notebook")
-    print(file_type)
+
     acts = {}
-    if file_type in {"xlsx", "xls"}:
+    if file_type in {"xlsx", "xls", "xlsb"}:
         # Open the Workbook
         try:
             workbooks = get_all_workplans(file_name, file_type)
         except ValueError:
-            print("nuked")
             return False
 
         for workbook in workbooks:
+            # get state and year from file_name
+            state, year = utils.get_state_and_plans(file_name, workbook)
             # Find header row start
             header_row, num_rows, num_cols = 0, len(workbook), len(workbook.columns)
             for row in range(0, num_rows):
@@ -165,15 +171,13 @@ def parse_activities(file_name, file_type):
                         header_row = row
                         break
 
-            utils.fill_nan_values(workbook, header_row)
-            print(workbook)
+            utils.fill_nan_values(workbook, header_row, ["Project Title"])
 
             print(f"header row is {header_row}")
             # map activity feature
             header_map = {}
             headers = ["Project Title", "Activity Title", "Activity", "Activity Description", "Timeline", "Status",
                        "Successes", "Challenges", "CDC Program Support Needed"]
-
 
             for col in range(0, num_cols):
                 curr_header = workbook.iat[header_row, col]
@@ -186,8 +190,12 @@ def parse_activities(file_name, file_type):
             for row in range(header_row + 1, num_rows):
                 curr_act = utils.init_act_obj()
                 curr_act_name = workbook.iat[row, act_col]
+                if isinstance(curr_act_name, float):
+                    break
                 curr_act["name"] = curr_act_name
                 curr_act["row"] = row
+                curr_act["state"] = state
+                curr_act["year"] = year
                 utils.add_features(workbook, curr_act, headers, header_map)
                 print(curr_act)
                 acts[curr_act_name] = curr_act
@@ -196,57 +204,19 @@ def parse_activities(file_name, file_type):
         print("not excel")
 
 
-
-
-def valid_content(file_name, file_type):
-    """
-    :param file_name: file being parsed
-    :param file_type: file type being parsed
-    :return: True if contents of file are valid, False otherwise
-    """
-
-    if file_type in {"xlsx", "xls"}:
-        # Open the Workbook
-        try:
-            workbook = pd.read_excel(file_name, sheet_name="Work Plan", header=4)
-        except ValueError:
-            return False
-
-        # Valid Columns for the Data
-        valid_columns = ["Project Title", "Activity Title", "Strategy", "Activity", "Activity Description", "Output",
-                         "Short-Term Outcome", "Timeline", "Status", "Successes", "Challenges",
-                         "CDC Program Support Needed"]
-        # Iterate through Excel sheet and check if given data matches correct data
-        for i in range(0, 12):
-            try:
-                print(workbook.iat[0, i])
-
-            except IndexError:
-                return False
-
-    elif file_type in {"pdf"}:
-        # ToDO
-        hello = 1 + 1
-
-    elif file_type in {"doc", "docx"}:
-        # ToDo
-        hello = 1 + 1
-
-    return True
-
-
-def get_all_workplans(file_name, file_type):
+def get_all_workplans(file_name, file_ext):
     # Finds specific sheet in excel and prints as dataframe
+    excel_engine = "pyxlsb" if file_ext in {"xlsb"} else "xlrd"
     workplans = []
-    wk_plan = 'Work Plan'
-    if file_type in {"xlsx"}:
-        # Open the Workbook
-        xl = pd.ExcelFile(file_name)
-        # Choose a specific sheet
-        for desired_sheet in xl.sheet_names:
-            if wk_plan in desired_sheet:
-                workbook = pd.read_excel(file_name, sheet_name=desired_sheet)
-                workplans.append(workbook)
+    wk_plan = 'workplan'
+    # Open the Workbook
+    xl = pd.ExcelFile(file_name, engine=excel_engine)
+    # Choose a specific sheet
+    for desired_sheet in xl.sheet_names:
+        fmt_sheet = desired_sheet.replace(" ", "").lower()
+        if wk_plan in fmt_sheet and "dontdelete" not in fmt_sheet:
+            workbook = pd.read_excel(file_name, sheet_name=desired_sheet, engine=excel_engine)
+            workplans.append(workbook)
     return workplans
 
 
@@ -264,7 +234,7 @@ def classify_files(path):
     }
 
     # get all files in path directory
-    if(os.path.isdir(path)):
+    if (os.path.isdir(path)):
         file_names = next(os.walk(path))[2]
         print(f"files in directory: {file_names}")
         for file_name in file_names:
@@ -273,7 +243,6 @@ def classify_files(path):
     else:
         file_type = path.split(".")[-1]
         parse_activities(path, file_type)
-
 
     print('------------')
     print(f"Valid: {categories[valid]}")
@@ -289,8 +258,8 @@ def main():
     data = main_screen()
     GUI(data)
     data.mainloop()
-    #folder = command_line_parsing()
-    #classify_files(folder)
+    # folder = command_line_parsing()
+    # classify_files(folder)
 
 
 if __name__ == "__main__":
