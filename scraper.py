@@ -10,7 +10,6 @@ from tkinter import filedialog
 import time
 import threading
 
-
 # need xlrd version xlrd==1.2.0
 
 def main_screen():
@@ -20,89 +19,114 @@ def main_screen():
     # data.state('zoomed')
     return data
 
-
-def extract_file(file, success, error):
+def extract_file(success, error, path_box):
+    path_box.delete(0, END)
     success.grid_remove()
     error.grid_remove()
-    file_path = filedialog.askopenfile(mode='r',
-                                       filetypes=[('All Files', '*.*'), ('Pdf file', '*.pdf'), ('Excel File', '*.xlsx'),
-                                                  ('Word File', '*.docx'), ('Word File', '*.doc'),
-                                                  ('Excel File', '*.xls'), ('Excel File', '*.xlsb')])
+    file_path = filedialog.askopenfile(mode='r', filetypes=[('All Files', '*.*'), ('Pdf file', '*.pdf'), ('Excel File', '*.xlsx'), ('Word File', '*.docx'), ('Word File', '*.doc'), ('Excel File', '*.xls'), ('Excel File', '*.xlsb')])
     if file_path is not None:
-        file.set(file_path.name)
+        path_box.insert(0, file_path.name)
+        #file.set(file_path.name)
 
-
-def extract_folder(folder, success, error):
+def extract_folder(success, error, path_box):
+    path_box.delete(0, END)
     success.grid_remove()
     error.grid_remove()
     folder_path = filedialog.askdirectory()
     if folder_path is not None:
-        folder.set(folder_path)
+        path_box.insert(0, folder_path)
+        #folder.set(folder_path)
 
-
-def upload(data, file, folder, error, success):
-    file_path = file.get()
-    folder_path = folder.get()
-    if (folder_path == "" and file_path == ""):
+def upload(data, error, success, path_box):
+    #file_path = file.get()
+    #folder_path = folder.get()
+    if(path_box.get() == ""):
         error.grid()
         return
+    #if(folder_path == "" and file_path == ""):
+    #    error.grid()
+    #    return
 
     progress_bar = Progressbar(data,
-                               orient=HORIZONTAL,
-                               length=300,
-                               mode='determinate')
-    progress_bar.grid(row=4, columnspan=3, pady=20)
-    if (folder_path != ""):
-        folder_thread = threading.Thread(target=classify_files, args=(folder_path,))
-        folder_thread.start()
-        print("Passing Folder")
+                                orient=HORIZONTAL,
+                                length=100,
+                                mode='indeterminate')
+    progress_bar.grid(row=5, columnspan=3, pady=20)
+    progress_bar.start()
 
-    else:
-        file_thread = threading.Thread(target=classify_files, args=(file_path,))
-        print(file_path)
-        file_thread.start()
-        print("Passing File")
+    # progress_bar_finished = Progressbar(data,
+    #                             orient=HORIZONTAL,
+    #                             length=100,
+    #                             mode='determinate')
+    # progress_bar_finished['value'] = 100
 
-    for i in range(5):
-        data.update_idletasks()
-        progress_bar['value'] += 20
-        time.sleep(1)
+    path_thread = threading.Thread(target=classify_files, args=(path_box.get(),))
+    path_thread.start()
+    while(path_thread.is_alive()):
+        data.update()
+        pass
     progress_bar.destroy()
-    file.set("")
-    folder.set("")
-    success.grid()
+    #progress_bar_finished.grid(row=5, columnspan=3, pady=20)
+    #progress_bar_finished.grid(row=5, columnspan=3, pady=20)
+    # if(folder_path != ""):
+    #     folder_thread = threading.Thread(target=classify_files, args=(folder_path,))
+    #     folder_thread.start()
+    #     print("Passing Folder")
 
+    # else:
+    #     file_thread = threading.Thread(target=classify_files, args=(file_path,))
+    #     print(file_path)
+    #     file_thread.start()
+    #     print("Passing File")
+
+    # for i in range(5):
+    #     data.update_idletasks()
+    #     progress_bar['value'] += 20
+    #     time.sleep(1)
+    # progress_bar.destroy()
+    #file.set("")
+    #folder.set("")
+    path_box.delete(0, END)
+    success.grid()
+    
 
 def GUI(data):
-    file = StringVar()
-    folder = StringVar()
-
+    #file = StringVar()
+    #folder = StringVar()
+    
     success = Label(data, text="Succesful Upload!", foreground='green')
-    success.grid(row=4, columnspan=3, pady=10)
+    success.grid(row=6, columnspan=3, pady=10)
     success.grid_remove()
-
+    
     error = Label(data, text="Error! No File or Folder Chosen!", foreground='red')
-    error.grid(row=4, columnspan=3, pady=10)
+    error.grid(row=6, columnspan=3, pady=10)
     error.grid_remove()
 
+    path_box = Entry(data, text="Full Path Here:", width=60)
+    path_box.grid(row=3, column=0)
+
     choose_upload = Label(data,
-                          text='Choose One: File or Folder. If both are chosen, defaults to folder.')
+                         text='Choose One: File or Folder. Please choose folder with files inside.')
     choose_upload.grid(row=0, column=0, padx=20)
 
     file_upload_button = Button(data,
                                 text='Choose File',
-                                command=lambda: extract_file(file, success, error))
+                                command=lambda:extract_file(success, error, path_box))
     file_upload_button.grid(row=1, column=0)
 
     folder_upload_button = Button(data,
-                                  text='Choose Folder',
-                                  command=lambda: extract_folder(folder, success, error))
+                                text='Choose Folder',
+                                command=lambda:extract_folder(success, error, path_box))
     folder_upload_button.grid(row=2, column=0)
 
+
+
+
     upload_button = Button(data,
-                           text="Upload",
-                           command=lambda: upload(data, file, folder, error, success))
-    upload_button.grid(row=3, columnspan=2, pady=10)
+                            text="Upload",
+                            command=lambda:upload(data, error, success, path_box))
+    upload_button.grid(row=4, columnspan=2, pady=10)
+
 
 
 def command_line_parsing():
@@ -120,7 +144,7 @@ def command_line_parsing():
     args = parser.parse_args()
     folder = args.folder
     file = args.file
-
+    
     if sys.platform == 'darwin':
         slash = '/'
     else:
