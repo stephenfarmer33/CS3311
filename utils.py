@@ -100,7 +100,7 @@ def find_entry(workbook, string):
     for row in range(0, num_rows):
         for col in range(0, num_cols):
             if string in workbook.iat[row, col]:
-                print(workbook.iat[row, col])
+                # print(workbook.iat[row, col])
                 return row, col
 
     return None
@@ -117,4 +117,5 @@ def init_act_obj():
     act["features"] = {}  # map of features
     act["state"] = None  # state of activity (GA, CA, etc)
     act["year"] = None  # budget period of current activities (August 1, 2019 - July 31, 2020, etc)
+    act["file"] = None  # full file name (with extension) where the act was parsed from
     return act

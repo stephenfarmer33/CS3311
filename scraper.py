@@ -177,12 +177,13 @@ def parse_activities(file_name, file_type):
     """
 
     acts = {}
-    if file_type in {"xlsx", "xls", "xlsb"}:
+    if file_type.lower() in {"xlsx", "xls", "xlsb"}:
         # Open the Workbook
         try:
             workbooks = get_all_workplans(file_name, file_type)
-        except ValueError:
-            return False
+        except ValueError as v:
+            print(v)
+            return None
 
         for workbook in workbooks:
             # get state and year from file_name
@@ -197,7 +198,6 @@ def parse_activities(file_name, file_type):
 
             utils.fill_nan_values(workbook, header_row, ["Project Title"])
 
-            print(f"header row is {header_row}")
             # map activity feature
             header_map = {}
             headers = ["Project Title", "Activity Title", "Activity", "Activity Description", "Timeline", "Status",
@@ -208,29 +208,31 @@ def parse_activities(file_name, file_type):
                 if curr_header in headers:
                     header_map[curr_header] = col
 
-            print(f"header map is {header_map}")
 
             act_col = header_map["Activity"]
             for row in range(header_row + 1, num_rows):
                 curr_act = utils.init_act_obj()
                 curr_act_name = workbook.iat[row, act_col]
                 if isinstance(curr_act_name, float):
-                    break
+                    continue
                 curr_act["name"] = curr_act_name
                 curr_act["row"] = row
                 curr_act["state"] = state
                 curr_act["year"] = year
+                curr_act["file"] = os.path.basename(file_name)
                 utils.add_features(workbook, curr_act, headers, header_map)
-                print(curr_act)
+                # print(curr_act)
                 acts[curr_act_name] = curr_act
+        return acts
 
     else:
-        print("not excel")
+        print(f"file {file_name} extension {file_type} not supported. Scraper only supports xlsx, xls, xlsb file extensions")
+        return None
 
 
 def get_all_workplans(file_name, file_ext):
     # Finds specific sheet in excel and prints as dataframe
-    excel_engine = "pyxlsb" if file_ext in {"xlsb"} else "xlrd"
+    excel_engine = "pyxlsb" if file_ext in {"xlsb"} else "openpyxl"
     workplans = []
     wk_plan = 'workplan'
     # Open the Workbook
@@ -249,29 +251,36 @@ def classify_files(path):
     :param path: path of the directory with target files
     :return: dictionary containing classification of files into 3 categories: valid, invalid_ext, invalid_cont
     """
-    valid, invalid_ext, invalid_cont = "valid", "invalid_ext", "invalid_cont"
+    success, failed, invalid = "success", "failed", "invalid"
 
     categories = {
-        valid: [],
-        invalid_ext: [],
-        invalid_cont: []
+        success: [],
+        failed: [],
+        invalid: []
     }
 
     # get all files in path directory
-    if (os.path.isdir(path)):
-        file_names = next(os.walk(path))[2]
-        print(f"files in directory: {file_names}")
-        for file_name in file_names:
-            file_type = file_name.split(".")[1]
-            parse_activities(os.path.join(path, file_name), file_type)
-    else:
-        file_type = path.split(".")[-1]
-        parse_activities(path, file_type)
+    file_names = next(os.walk(path))[2] if os.path.isdir(path) else [path]
+    print(f"files in directory: {file_names}")
+    for file_name in file_names:
+        try:
+            file_type = file_name.split(".")[-1]
+            curr_file_acts = parse_activities(os.path.join(path, file_name), file_type)
+            categories[invalid].append(os.path.basename(file_name)) if curr_file_acts is None else categories[success].append(os.path.basename(file_name))
+            if curr_file_acts is not None:
+                print(f"num of acts found: {len(curr_file_acts)}")
+            # insert into database
+            print("------------------------------------------------")
+
+        except Exception as e:
+            categories[failed].append(os.path.basename(file_name))
+            print(f"{os.path.basename(file_name)} failed to parse")
+            print(e)
 
     print('------------')
-    print(f"Valid: {categories[valid]}")
-    print(f"Invalid Extension: {categories[invalid_ext]}")
-    print(f"Invalid Content: {categories[invalid_cont]}")
+    print(f"Valid: {categories[success]}")
+    print(f"Invalid Extension: {categories[failed]}")
+    print(f"Invalid Content: {categories[invalid]}")
 
     return categories
 
