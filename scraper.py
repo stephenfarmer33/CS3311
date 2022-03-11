@@ -201,6 +201,7 @@ def parse_activities(file_name, file_type):
 
             # map activity feature
             header_map = {}
+            # todo: add outcomes... to thing
             headers = ["Project Title", "Activity Title", "Activity", "Activity Description", "Timeline", "Status",
                        "Successes", "Challenges", "CDC Program Support Needed"]
 
