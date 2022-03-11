@@ -24,11 +24,11 @@ cursor = None
 
 insert_query = {
     'projects': ("INSERT INTO projects "
-            "(ProjectID, Project, State, Budget_Period, Reporting_Period) "
-            "VALUES (%(ProjectID)s, %(Project)s, %(State)s, %(Budget Period)s, %(Reporting Period)s);"),
-    'activities': ("INSERT INTO projects "
-            "(ID, Activity, Description, Outcome, Output, Timeline, Statistics, Status, Successes, Challenges, CDC_Support_Needed) "
-            "VALUES (%(ID)s, %(Activity)s, %(Description)s, %(Outcome)s, %(Output)s, %(Timeline)s, %(Statistics)s, %(Status)s, %(Successes)s, %(Challenges)s, %(CDC_Support_Needed)s);")
+            "(Project, State, Budget_Period_Start, Budget_Period_End, Reporting_Period) "
+            "VALUES (%(Project)s, %(State)s, %(Budget_Period_Start)s, %(Budget_Period_End)s, %(Reporting_Period)s);"),
+    'activities': ("INSERT INTO activities "
+            "(ProjectID, Activity, Description, Outcome, Output, Timeline, Statistics, Status, Successes, Challenges, CDC_Support_Needed, Parent_File) "
+            "VALUES (%(ProjectID)s, %(Activity)s, %(Description)s, %(Outcome)s, %(Output)s, %(Timeline)s, %(Statistics)s, %(Status)s, %(Successes)s, %(Challenges)s, %(CDC_Support_Needed)s, %(Parent_File)s);")
 }
 
 def connect():
@@ -44,7 +44,7 @@ def connect():
         else:
             print(err)
 
-    print('Database connection:', cnx)
+    print('Database connection opened:', cnx)
     cursor = cnx.cursor()
     
 # insert multiple rows?
@@ -54,6 +54,9 @@ def insert(table, data):
     :param table: str table to insert
     :param data: list of dict of data to insert 
     """
+    # can use either single dict or list of dict
+    # if type(data) == dict:
+    #     data = [data]
     if table in insert_query:
         try:
             cursor.executemany(insert_query[table], data)
@@ -71,11 +74,21 @@ def remove(table, data):
     pass
 
 def close_connection():
+    """
+    closes SQL connection
+    """
     if cnx:
-        print('Closed connection:', cnx)
+        print('Database connection closed:', cnx)
         cnx.close()
         cursor.close()
     else:
         print('No connection to close')
+
+def get_latest_projectID():
+    """
+    gets latest projectID for indexing
+    """
+    cursor.execute('SELECT COUNT(*) from projects;')
+    return cursor.fetchone()[0]
 
 connect()
