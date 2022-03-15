@@ -9,6 +9,7 @@ from tkinter.ttk import *
 from tkinter import filedialog
 import time
 import threading
+import sql_connection
 
 # need xlrd version xlrd==1.2.0
 
@@ -245,6 +246,72 @@ def get_all_workplans(file_name, file_ext):
             workplans.append(workbook)
     return workplans
 
+def insert_acts_into_db(acts):
+    """
+    inserts activities and projects into database
+    :param acts: dictionary of activities (output of parse_activities())
+    :return: bool if success
+    """
+    # insert projects
+    project_title = None
+    state = None
+    budget_period = None
+    reporting_period = None
+    added_projects = set()
+    # insert activities
+    
+    for activity, values in acts.items():
+        features = values['features']
+        project_title = features['Project Title']
+        state = values['state']
+        budget_period = values['year']
+
+        # todo: parse datetime
+        # add projects
+        if project_title not in added_projects:
+            added_projects.add(project_title)
+
+            data = [{
+                'Project': project_title,
+                'State': state,
+                'Budget_Period_Start': '1998-01-01',
+                'Budget_Period_End': '1998-01-01',
+                'Reporting_Period': '1998-01-01'
+            }]
+            sql_connection.insert('projects', data)
+
+        latest_id = sql_connection.get_latest_projectID()
+        # headers = ["Project Title", "Activity Title", "Activity", "Activity Description", "Timeline", "Status",
+                    #    "Successes", "Challenges", "CDC Program Support Needed"]
+        
+        activity = features['Activity']
+        description = features['Activity Description']
+        timeline = features['Timeline']
+        status = features['Status']
+        successes = features['Successes']
+        challenges = features['Challenges']
+        CDC_Support_Needed = features['CDC Program Support Needed']
+
+        #print(type(successes), successes)
+        data = [{
+            'ProjectID': latest_id,
+            'Activity': activity,
+            'Description': description,
+            'Outcome': 'sample outcome',
+            'Output' : 'sample output',
+            'Timeline': timeline,
+            'Statistics': 'sample statistics',
+            'Status': status,
+            'Successes': successes,
+            'Challenges': challenges,
+            'CDC_Support_Needed': CDC_Support_Needed,
+            'Parent_File' : 'sample parent file'
+        }]
+        for k in data[0]:
+            if str(data[0][k]) == 'nan':
+                data[0][k] = None
+        sql_connection.insert('activities', data)
+    return True
 
 def classify_files(path):
     """
@@ -271,6 +338,7 @@ def classify_files(path):
                 print(f"num of acts found: {len(curr_file_acts)}")
             # insert into database
             print("------------------------------------------------")
+            insert_acts_into_db(curr_file_acts)
 
         except Exception as e:
             categories[failed].append(os.path.basename(file_name))
@@ -291,6 +359,7 @@ def main():
     data = main_screen()
     GUI(data)
     data.mainloop()
+    sql_connection.close_connection()
     # folder = command_line_parsing()
     # classify_files(folder)
 
