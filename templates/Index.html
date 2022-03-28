@@ -1,0 +1,350 @@
+{% extends 'base.html' %}
+{% include 'header.html' %}
+
+{% block title %} Home {% endblock %}
+
+{% block body %}  
+
+<div class="container">
+    <div class="row">
+        <div class="col md-12">
+
+            <div class="jumbotron p-3">
+
+                <h2>Manage <b>Employees</b> <button type="button" class="btn btn-success"
+                    data-bs-toggle="modal" data-bs-target="#mymodal">Add New Employees</button></h2>
+
+                <table class="table table-hover table-dark">
+
+                    <tr>
+
+                        <th>ActivityID</th>
+                        <th>ProjectID</th>
+                        <th>Activity</th>
+                        <th>Description</th>
+                        <th>Outcome</th>
+                        <th>Output</th>
+                        <th>Timeline</th>
+                        <th>Statistics</th>
+                        <th>Status</th>
+                        <th>Successes</th>
+                        <th>Challenges</th>
+                        <th>CDC_Support_Needed</th>
+                        <th>Parent_File</th>
+                        <th>Action</th>
+
+
+                    </tr>
+
+                    <tr>
+                        <td>ActivityID</td>
+                        <td>ProjectID</td>
+                        <td>Activity</td>
+                        <td>Description</td>
+                        <td>Outcome</td>
+                        <td>Output</td>
+                        <td>Timeline</td>
+                        <td>Statistics</td>
+                        <td>Status</td>
+                        <td>Successes</td>
+                        <td>Challenges</td>
+                        <td>CDC_Support_Needed</td>
+                        <td>Parent_File</td>    
+
+                        <td>
+                            <a href="" class="btn btn-warning btn-xs" data-bs-toggle="modal" data-bs-target="#modaledit">Edit</a>
+                            <a href="" class="btn btn-danger btn-xs" onclick="return confirm('Do you want to delete?')">Delete</a>
+
+                        </td>
+
+
+                    </tr>
+
+                    <div id="modaledit" class="modal fade" role="dialog">
+                        <div class="modal-dialog modal-dialog-scrollable">
+                           <div class="modal-content">
+                              <div class="modal-header">
+                      
+                                 <h4 class="modal-title">Update Information</h4>
+                              </div>
+                              <div class="modal-body">
+                      
+                                 <form action="" method="POST">
+                      
+                      
+                      
+                                     <div class="form-group">
+                      
+                      
+                                       <label>Activity:</label>
+                                       <input type="hidden" name="ActivityID" value="ActivityID">
+                                       <input type="hidden" name="ProjectID" value="ProjectID">
+                                       <input type="text" class="form-control" name="Activity" value="1">
+                      
+                      
+                                    </div>
+                      
+                      
+                                     <div class="form-group">
+                      
+                      
+                                       <label>Description:</label>
+                                       <input type="text" class="form-control" name="Description" value="1">
+                      
+                      
+                                    </div>
+        
+                                    <div class="form-group">
+                      
+                                        <label>Outcome:</label>
+                                        <input type="text" class="form-control" name="Outcome" value="1">
+                       
+                       
+                                    </div>
+        
+                                    <div class="form-group">
+                      
+                                        <label>Output:</label>
+                                        <input type="text" class="form-control" name="Output" value="1">
+                       
+                       
+                                    </div>
+        
+                                    <div class="form-group">
+                      
+                                        <label>Timeline:</label>
+                                        <input type="text" class="form-control" name="Timeline" value="1">
+                       
+                       
+                                    </div>
+        
+                                    <div class="form-group">
+                      
+                                        <label>Statistics:</label>
+                                        <input type="text" class="form-control" name="Statistics" value="1">
+                       
+                       
+                                    </div>
+        
+                                    <div class="form-group">
+                      
+                                        <label>Status:</label>
+                                        <input type="text" class="form-control" name="Status" value="1">
+                       
+                       
+                                    </div>
+        
+                                    <div class="form-group">
+                      
+                                        <label>Successes:</label>
+                                        <input type="text" class="form-control" name="Successes" value="1">
+                       
+                       
+                                    </div>
+        
+                                    <div class="form-group">
+                      
+                                        <label>Challenges:</label>
+                                        <input type="text" class="form-control" name="Challenges" value="1">
+                       
+                       
+                                    </div>
+        
+                                    <div class="form-group">
+                      
+                                        <label>CDC_Support_Needed:</label>
+                                        <input type="text" class="form-control" name="CDC_Support_Needed" value="1">
+                       
+                       
+                                    </div>
+        
+                                    <div class="form-group">
+                      
+                                        <label>Parent_File:</label>
+                                        <input type="text" class="form-control" name="Parent_File" value="1">
+                       
+                       
+                                    </div>
+                      
+                      
+                      
+                                    <div class="form-group">
+                      
+                      
+                                       <button class="btn btn-primary" type="submit">Update</button>
+                      
+                      
+                                    </div>
+                      
+                      
+                                 </form>
+                      
+                      
+                              </div>
+                      
+                      
+                              <div class="modal-footer">
+                      
+                      
+                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      
+                      
+                              </div>
+                      
+                      
+                           </div>
+                      
+                      
+                        </div>
+                      
+                      
+                     </div>
+
+
+                </table>
+
+                
+
+            </div>
+
+            <div id="mymodal" class="modal fade" role="dialog">
+                <div class="modal-dialog modal-dialog-scrollable">
+                   <div class="modal-content">
+                      <div class="modal-header">
+              
+                         <h4 class="modal-title">Add Employee</h4>
+                      </div>
+                      <div class="modal-body">
+              
+                         <form action="{{url_for('insert')}}" method="POST">
+              
+                             <div class="form-group">
+              
+              
+                               <label>Activity:</label>
+                               <input type="text" class="form-control" name="Activity" required="1">
+              
+              
+                            </div>
+              
+              
+                             <div class="form-group">
+              
+              
+                               <label>Description:</label>
+                               <input type="text" class="form-control" name="Description" required="1">
+              
+              
+                            </div>
+
+                            <div class="form-group">
+              
+                                <label>Outcome:</label>
+                                <input type="text" class="form-control" name="Outcome" required="1">
+               
+               
+                            </div>
+
+                            <div class="form-group">
+              
+                                <label>Output:</label>
+                                <input type="text" class="form-control" name="Output" required="1">
+               
+               
+                            </div>
+
+                            <div class="form-group">
+              
+                                <label>Timeline:</label>
+                                <input type="text" class="form-control" name="Timeline" required="1">
+               
+               
+                            </div>
+
+                            <div class="form-group">
+              
+                                <label>Statistics:</label>
+                                <input type="text" class="form-control" name="Statistics" required="1">
+               
+               
+                            </div>
+
+                            <div class="form-group">
+              
+                                <label>Status:</label>
+                                <input type="text" class="form-control" name="Status" required="1">
+               
+               
+                            </div>
+
+                            <div class="form-group">
+              
+                                <label>Successes:</label>
+                                <input type="text" class="form-control" name="Successes" required="1">
+               
+               
+                            </div>
+
+                            <div class="form-group">
+              
+                                <label>Challenges:</label>
+                                <input type="text" class="form-control" name="Challenges" required="1">
+               
+               
+                            </div>
+
+                            <div class="form-group">
+              
+                                <label>CDC_Support_Needed:</label>
+                                <input type="text" class="form-control" name="CDC_Support_Needed" required="1">
+               
+               
+                            </div>
+
+                            <div class="form-group">
+              
+                                <label>Parent_File:</label>
+                                <input type="text" class="form-control" name="Parent_File" required="1">
+               
+               
+                            </div>
+              
+              
+              
+                            <div class="form-group">
+              
+              
+                               <button class="btn btn-primary" type="submit">Add Employee</button>
+              
+              
+                            </div>
+              
+              
+                         </form>
+              
+              
+                      </div>
+              
+              
+                      <div class="modal-footer">
+              
+              
+                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              
+              
+                      </div>
+              
+              
+                   </div>
+              
+              
+                </div>
+              
+              
+             </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
