@@ -14,6 +14,10 @@ import sql_connection
 # need xlrd version xlrd==1.2.0
 
 def main_screen():
+    """
+    Creates initial screen where elements will be added
+    :return: Tkinter Window
+    """
     data = Tk()
     data.title('Data Extraction')
     data.geometry('400x200')
@@ -21,6 +25,12 @@ def main_screen():
     return data
 
 def extract_file(success, error, path_box):
+    """
+    Allows user to choose file to be uploaded
+    :param sucess: Label indicating successful upload
+    :param error: Label indicating unsuccessful upload
+    :param path_box: Entry where File Path is stored
+    """
     path_box.delete(0, END)
     success.grid_remove()
     error.grid_remove()
@@ -30,6 +40,12 @@ def extract_file(success, error, path_box):
         #file.set(file_path.name)
 
 def extract_folder(success, error, path_box):
+    """
+    Allows user to choose folder to be uploaded
+    :param sucess: Label indicating successful upload
+    :param error: Label indicating unsuccessful upload
+    :param path_box: Entry where Folder Path is stored
+    """
     path_box.delete(0, END)
     success.grid_remove()
     error.grid_remove()
