@@ -5,7 +5,7 @@ import mysql.connector
 
 app = Flask(__name__)
 app.secret_key = 'Secret Key'
-#app.config['SQLALCHEMTY_DATABASE_URI'] = 'mysql://root:penguin122333@localhost/cs3311'
+#app.config['SQLALCHEMTY_DATABASE_URI'] = 'mysql://root:""@localhost/cs3311'
 #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 #db = SQLAlchemy(app)
