@@ -21,7 +21,6 @@ def main_screen():
     data = Tk()
     data.title('Data Extraction')
     data.geometry('400x200')
-    # data.state('zoomed')
     return data
 
 def extract_file(success, error, path_box):
@@ -34,10 +33,10 @@ def extract_file(success, error, path_box):
     path_box.delete(0, END)
     success.grid_remove()
     error.grid_remove()
-    file_path = filedialog.askopenfile(mode='r', filetypes=[('All Files', '*.*'), ('Pdf file', '*.pdf'), ('Excel File', '*.xlsx'), ('Word File', '*.docx'), ('Word File', '*.doc'), ('Excel File', '*.xls'), ('Excel File', '*.xlsb')])
+    file_path = filedialog.askopenfile(mode='r', filetypes=[('All Files', '*.*'), ('Excel File', '*.xlsx'), ('Excel File', '*.xls'), ('Excel File', '*.xlsb')])
     if file_path is not None:
         path_box.insert(0, file_path.name)
-        #file.set(file_path.name)
+
 
 def extract_folder(success, error, path_box):
     """
@@ -52,18 +51,21 @@ def extract_folder(success, error, path_box):
     folder_path = filedialog.askdirectory()
     if folder_path is not None:
         path_box.insert(0, folder_path)
-        #folder.set(folder_path)
+
 
 def upload(data, error, success, path_box):
-    #file_path = file.get()
-    #folder_path = folder.get()
+    """
+    Allows user to upload the file/folder with the documents to be scraped
+    :param sucess: Label indicating successful upload
+    :param error: Label indicating unsuccessful upload
+    :param path_box: Entry where Folder Path is stored
+    :return: Exit function early if path box is empty
+    """
+
     if(path_box.get() == ""):
         error.grid()
         return
-    #if(folder_path == "" and file_path == ""):
-    #    error.grid()
-    #    return
-
+ 
     progress_bar = Progressbar(data,
                                 orient=HORIZONTAL,
                                 length=100,
@@ -71,46 +73,22 @@ def upload(data, error, success, path_box):
     progress_bar.grid(row=5, columnspan=3, pady=20)
     progress_bar.start()
 
-    # progress_bar_finished = Progressbar(data,
-    #                             orient=HORIZONTAL,
-    #                             length=100,
-    #                             mode='determinate')
-    # progress_bar_finished['value'] = 100
-
     path_thread = threading.Thread(target=classify_files, args=(path_box.get(),))
     path_thread.start()
     while(path_thread.is_alive()):
         data.update()
         pass
     progress_bar.destroy()
-    #progress_bar_finished.grid(row=5, columnspan=3, pady=20)
-    #progress_bar_finished.grid(row=5, columnspan=3, pady=20)
-    # if(folder_path != ""):
-    #     folder_thread = threading.Thread(target=classify_files, args=(folder_path,))
-    #     folder_thread.start()
-    #     print("Passing Folder")
 
-    # else:
-    #     file_thread = threading.Thread(target=classify_files, args=(file_path,))
-    #     print(file_path)
-    #     file_thread.start()
-    #     print("Passing File")
-
-    # for i in range(5):
-    #     data.update_idletasks()
-    #     progress_bar['value'] += 20
-    #     time.sleep(1)
-    # progress_bar.destroy()
-    #file.set("")
-    #folder.set("")
     path_box.delete(0, END)
     success.grid()
     
 
 def GUI(data):
-    #file = StringVar()
-    #folder = StringVar()
-    
+    """
+    Creates all the GUI elements
+    :param data: Tkinter window to place all of these elements
+    """
     success = Label(data, text="Succesful Upload!", foreground='green')
     success.grid(row=6, columnspan=3, pady=10)
     success.grid_remove()
@@ -136,9 +114,6 @@ def GUI(data):
                                 command=lambda:extract_folder(success, error, path_box))
     folder_upload_button.grid(row=2, column=0)
 
-
-
-
     upload_button = Button(data,
                             text="Upload",
                             command=lambda:upload(data, error, success, path_box))
@@ -148,6 +123,7 @@ def GUI(data):
 
 def command_line_parsing():
     """
+    DEPRECATED: Allows user to set file or folder path
     :return: Folder path, either given by user or default folder path
     """
     parser = argparse.ArgumentParser(description='Process Public Health Information for Database Dumping',
@@ -155,8 +131,6 @@ def command_line_parsing():
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-f', '--folder', help='Location of the folder containing the files to be processed.')
     group.add_argument('-fi', '--file', help='Singular file to be processed. Please put full (absolute) path of file')
-    # parser.add_argument('-f', '--folder', help='Location of the folder containing the files to be processed. If using the default (dummy) folder, do not use this option')
-    # parser.add_argument('-fi', '--file', help='Singular file to be processed')
 
     args = parser.parse_args()
     folder = args.folder
