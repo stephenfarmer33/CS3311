@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 import mysql.connector
 
@@ -39,7 +39,10 @@ cursor = cnx.cursor()
 @app.route("/")
 
 def Index():
-    return render_template("Index.html")
+    s = "Select * FROM cs3311.activities"
+    cursor.execute(s)
+    list_activities = cursor.fetchall()
+    return render_template("Index.html", activities = list_activities)
 
 @app.route('/insert', methods = ['POST'])
 def insert():
@@ -77,7 +80,67 @@ def insert():
         if table_activities in insert_query:
             cursor.executemany(insert_query[table_activities], data_activities)
             cnx.commit()
+        
+        flash("Activity Inserted Successfully")
+
         return redirect(url_for('Index'))
+
+@app.route('/update', methods = ['GET', 'POST'])
+def update():
+    if request.method == 'POST':
+        id = request.form.get('ActivityID')
+        query = "Select * FROM cs3311.activities WHERE ActivityID = %s"
+        #value = (int(id),)
+        #value = (int(id))
+        #cursor.execute(s)
+        cursor.execute(query, (id, ))
+        rel_activities = cursor.fetchall()
+        print(rel_activities)
+        activityID = rel_activities[0][0]
+        print(activityID)
+
+        activity = request.form['Activity']
+        description = request.form['Description']
+        outcome = request.form['Outcome']
+        output = request.form['Output']
+        timeline = request.form['Timeline']
+        statistics = request.form['Statistics']
+        status = request.form['Status']
+        successes = request.form['Successes']
+        challenges = request.form['Challenges']
+        CDC_Support_Needed = request.form['CDC_Support_Needed']
+        Parent_File = request.form['Parent_File']
+
+        sql = """
+        UPDATE activities
+        SET Activity = %s,
+            Description = %s,
+            Outcome = %s,
+            Output = %s,
+            Timeline = %s,
+            Statistics = %s,
+            Status = %s,
+            Successes = %s,
+            Challenges = %s,
+            CDC_Support_Needed = %s,
+            Parent_File = %s
+        WHERE ActivityID = %s
+        """        
+        cursor.execute(sql, (str(activity), str(description), str(outcome), str(output), str(timeline), str(statistics), 
+                        str(status), str(successes), str(challenges), str(CDC_Support_Needed), str(Parent_File), activityID))
+        cnx.commit()
+
+        flash("Activity Updated Successfully")
+
+        return redirect(url_for('Index'))
+
+@app.route('/delete/<ActivityID>/', methods = ['GET', 'POST'])
+def delete(ActivityID):
+    sql = "DELETE FROM activities WHERE ActivityID = %s"
+    cursor.execute(sql, (ActivityID,))
+    cnx.commit()
+    flash("Activity Deleted")
+    return redirect(url_for('Index'))
 
 
 if(__name__) == "__main__":
