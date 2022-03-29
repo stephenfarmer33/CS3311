@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link href="{{url_for('static', filename = 'css/bootstrap.min.css')}}" rel="stylesheet"/>
+    <link type="text/css" href="{{url_for('static', filename = 'css/bootstrap.min.css')}}" rel="stylesheet"/>
+    <link type="text/css" href="{{url_for('static', filename = 'css/dataTables.bootstrap5.min.css')}}" rel="stylesheet"/>
+    <!--<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">-->
+    
+
     
     <meta charset="UTF-8">
     <title>{% block title %} {% endblock %}</title>
@@ -12,6 +16,23 @@
 
 <script type="text/javascript" src="{{url_for('static', filename = 'js/jquery-3.6.0.min.js')}}"></script>
 <script type="text/javascript" src="{{url_for('static', filename = 'js/bootstrap.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename = 'js/jquery.dataTables.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename = 'js/dataTables.bootstrap5.min.js')}}"></script>
+<!--<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>-->
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        $('#datatable').DataTable( {
+            "bDestroy": true,
+            "scrollY": "450px",
+            "scrollCollapse": true,
+            "scrollX": true,
+        });
+    } );
+
+</script>
 
 
 </body>
