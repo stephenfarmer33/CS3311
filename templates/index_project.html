@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+{% include 'header.html' %}
+
+{% block title %} Home {% endblock %}
+
+{% block body %}  
+
+<div class="container">
+    <div class="row">
+        <div class="col md-12">
+
+            <div class="jumbotron p-3">
+            <!--<div class="bg-light p-5 rounded-lg m-3">-->
+
+                <h2>Manage <b>Projects</b> <button type="button" class="btn btn-success float-end"
+                    data-bs-toggle="modal" data-bs-target="#mymodal">Add New Projects</button></h2>
+                
+                    {% with messages = get_flashed_messages() %}
+
+                    {% if messages %}
+
+                    {% for message in messages %}
+
+                    <div class = "alert alert-success alert-dismissable" role="alert">
+
+                        {{message}}
+
+                        <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close">
+
+                        </button>
+
+                        
+
+                    </div>
+
+                    {% endfor %}
+
+                    {% endif %}
+                    {% endwith %}
+                <div class="child child3">
+                    <ul class="nav nav-tabs nav-fill" style="background-color:rgb(25,135,84);">
+                        <li class="nav-item">
+                             <a class="nav-link" style="color:whitesmoke;" href="{{url_for('change')}}">Project</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" style="color:whitesmoke;" href="{{url_for('Index')}}">Activity</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <table id="datatable" class="table table-striped">
+                    <thead>
+
+                    <tr>
+
+                        <th>ProjectID</th>
+                        <th>Project</th>
+                        <th>State</th>
+                        <th>Budget_Period_Start</th>
+                        <th>Budget_Period_End</th>
+                        <th>Reporting_Period_Start</th>
+                        <th>Reporting_Period_End</th>
+    
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for row in projects %}
+                    <tr>
+                        <td>{{row[0]}}</td>
+                        <td>{{row[1]}}</td>
+                        <td>{{row[2]}}</td>
+                        <td>{{row[3]}}</td>
+                        <td>{{row[4]}}</td>
+                        <td>{{row[5]}}</td>
+                        <td>{{row[6]}}</td>  
+
+                        <td>
+                            <a href="/update/{{row[0]}}" class="btn btn-warning btn-xs" data-bs-toggle="modal" data-bs-target="#modaledit{{row[0]}}">Edit</a>
+                            <a href="/delete/{{row[0]}}" class="btn btn-danger btn-xs" onclick="return confirm('Do you want to delete?')">Delete</a>
+                        </td>
+
+
+                    </tr>
+
+                    <div id="modaledit{{row[0]}}" class="modal fade" role="dialog">
+                        <div class="modal-dialog modal-dialog-scrollable">
+                           <div class="modal-content">
+                              <div class="modal-header">
+                      
+                                 <h4 class="modal-title">Update Information</h4>
+                              </div>
+                              <div class="modal-body">
+                      
+                                 <form action="{{url_for('update')}}" method="POST">
+                      
+                      
+                      
+                                     <div class="form-group">
+                      
+                      
+                                       <label>Project:</label>
+                                       <input type="hidden" name="ProjectID" value="{{row[0]}}">
+                                       <input type="hidden" name="Project" value="{{row[1]}}">
+                                       <input type="text" class="form-control" name="State" value="{{row[2]}}">
+                      
+                      
+                                    </div>
+                      
+                      
+                                     <div class="form-group">
+                      
+                      
+                                       <label>Budget:</label>
+                                       <input type="datetime" class="form-control" name="Budget_Period_Start" value="{{row[3]}}">
+                                       <input type="datetime" class="form-control" name="Budget_Period_End" value="{{row[4]}}">
+                      
+                      
+                                    </div>
+        
+                                    <div class="form-group">
+                      
+                                        <label>Report:</label>
+                                        <input type="text" class="form-control" name="Reporting_Period_Start" value="{{row[5]}}">
+                                        <input type="text" class="form-control" name="Reporting_Period_End" value="{{row[6]}}">
+                       
+                       
+                                    </div>
+        
+                                
+                                    <div class="form-group">
+                      
+                      
+                                       <button class="btn btn-primary" type="submit">Update</button>
+                      
+                      
+                                    </div>
+                      
+                      
+                                 </form>
+                      
+                      
+                              </div>
+                      
+                      
+                              <div class="modal-footer">
+                      
+                      
+                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      
+                      
+                              </div>
+                      
+                      
+                           </div>
+                      
+                      
+                        </div>
+                      
+                      
+                     </div>
+
+                     {% endfor %}
+
+                    </tbody>
+                </table>
+
+                
+
+            </div>
+
+            <div id="mymodal" class="modal fade" role="dialog">
+                <div class="modal-dialog modal-dialog-scrollable">
+                   <div class="modal-content">
+                      <div class="modal-header">
+              
+                         <h4 class="modal-title">Add Project</h4>
+                      </div>
+                      <div class="modal-body">
+              
+                         <form action="{{url_for('insert')}}" method="POST">
+              
+                             <div class="form-group">
+              
+              
+                               <label>Project:</label>
+                               <input type="text" class="form-control" name="Project" required="1">
+              
+              
+                            </div>
+              
+              
+                             <div class="form-group">
+              
+              
+                               <label>State:</label>
+                               <input type="text" class="form-control" name="State" required="1">
+              
+              
+                            </div>
+
+                            <div class="form-group">
+              
+                                <label>Budget_Period_Start:</label>
+                                <input type="datetime" class="form-control" name="Budget_Period_Start" required="1">
+               
+               
+                            </div>
+
+                            <div class="form-group">
+              
+                                <label>Budget_Period_Start:</label>
+                                <input type="datetime" class="form-control" name="Budget_Period_Start" required="1">
+               
+               
+                            </div>
+
+                            <div class="form-group">
+              
+                                <label>Reporting_Period_Start:</label>
+                                <input type="text" class="form-control" name="Reporting_Period_Start" required="1">
+               
+               
+                            </div>
+
+                            <div class="form-group">
+              
+                                <label>Reporting_Period_End:</label>
+                                <input type="text" class="form-control" name="Reporting_Period_End" required="1">
+               
+               
+                            </div>
+
+                            <div class="form-group">
+              
+                                <label>Parent_File:</label>
+                                <input type="text" class="form-control" name="Parent_File" required="1">
+               
+               
+                            </div>
+              
+              
+              
+                            <div class="form-group">
+              
+              
+                               <button class="btn btn-primary" type="submit">Add Project</button>
+              
+              
+                            </div>
+              
+              
+                         </form>
+              
+              
+                      </div>
+              
+              
+                      <div class="modal-footer">
+              
+              
+                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              
+              
+                      </div>
+              
+              
+                   </div>
+              
+              
+                </div>
+              
+              
+             </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
