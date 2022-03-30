@@ -12,7 +12,6 @@ app.secret_key = 'Secret Key'
 
 #class Data(db.model):
 #    id = db.Column(db.Integer)
-
 #DB_HOST = '127.0.0.1'
 #DB_NAME = 'CS3311'
 #DB_USER = 'cs3311_admin'
@@ -84,6 +83,11 @@ def insert():
         flash("Activity Inserted Successfully")
 
         return redirect(url_for('Index'))
+
+@app.route('/Change Page')
+def change():
+    return render_template('index_project.html')
+
 
 @app.route('/update', methods = ['GET', 'POST'])
 def update():

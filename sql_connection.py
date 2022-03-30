@@ -14,8 +14,8 @@ from mysql.connector import errorcode
 #    example code found at sql_test.py
 
 config = {
-    'user': 'cs3311_admin',
-    'password': 'password',
+    'user': 'root',
+    'password': 'Sssugar200214890_^',
     'host': '127.0.0.1',
     'database': 'CS3311'
 }
