@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLASK-CRUD_APP_login_page.</title>
+</head>
+<body>
+        <div class="mainTitle">
+            <h3 class=" ">Login Page {% if loginerror %} {{ loginerror }} {% endif %}</h3>
+        </div>
+
+        <div class="userCheck">
+          {% if user %}
+          <h3 class="m-2"><i>User : {{user['name']}}</i></h3>
+          {% endif %}
+        </div>
+        
+        <div class="child child6 container">
+          <form class="p-3" action="/login" method = "POST">
+            <div class="mb-3">
+              <label for="exinputUser" class="form-label">Username: </label>
+              <input type="text" name="username" class="form-control" id="exinputUser">
+              
+            </div>
+            <div class="mb-3">
+              <label for="exinputPassword" class="form-label">Password: </label>
+              <input type="password" name="password" class="form-control" id="exinputPassword">
+            </div>
+            <button type="submit" class="btn text-light" style="background-color:rgb(70, 170, 170);">Sign In</button>
+          </form>
+        </div>
+ 
+
+      </div>
+</body>
+</html>

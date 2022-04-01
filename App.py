@@ -1,3 +1,4 @@
+# from crypt import methods
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 import mysql.connector
@@ -35,13 +36,30 @@ insert_query = {
 cnx = mysql.connector.connect(**config)
 cursor = cnx.cursor()
 
-@app.route("/")
+tempUserName = 'cs3311_admin'
+tempPassword = 'password'
+loggedIn = False
 
+@app.route("/")
+@app.route('/login', methods = ["GET", "POST"])
+def login():
+    loggedIn = False
+    if request.method == 'POST':
+        name = request.form['username']
+        password = request.form['password']
+        if tempUserName == name and tempPassword == password:
+            loggedIn = True
+            return redirect(url_for('Index'))
+
+    return(render_template('login.html'))
+
+@app.route("/dashboard")
 def Index():
     s = "Select * FROM cs3311.activities"
     cursor.execute(s)
     list_activities = cursor.fetchall()
     return render_template("Index.html", activities = list_activities)
+    
 
 @app.route('/insert', methods = ['POST'])
 def insert():
@@ -145,6 +163,8 @@ def delete(ActivityID):
     cnx.commit()
     flash("Activity Deleted")
     return redirect(url_for('Index'))
+
+
 
 
 if(__name__) == "__main__":
