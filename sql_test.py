@@ -10,7 +10,8 @@ data = [{
     'State': 'Georgia',
     'Budget_Period_Start': '1998-01-01',
     'Budget_Period_End': '1998-01-01',
-    'Reporting_Period': '1998-01-01'
+    'Reporting_Period': '1998-01-01',
+    'File_Name': 'test name'
 }]
 
 data_many = [{
@@ -45,10 +46,10 @@ data_activities = [{
 }]
 
 # insert data into db with given table and data
-#sql_connection.insert(table, data)
-sql_connection.insert(table_activities, data_activities)
+sql_connection.insert(table, data)
+#sql_connection.insert(table_activities, data_activities)
 #print('Last executed id', sql_connection.get_latest_projectID())
-print(sql_connection.get_latest_projectID())
+#print(sql_connection.get_latest_projectID())
 
 # close the connection
 sql_connection.close_connection()

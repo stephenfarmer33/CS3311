@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS `projects` (
   `Budget_Period_Start` datetime,
   `Budget_Period_End` datetime,
   `Reporting_Period` text,
+  `File_Name` text,
   PRIMARY KEY (`ProjectID`),
   UNIQUE KEY `ProjectID_UNIQUE` (`ProjectID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
