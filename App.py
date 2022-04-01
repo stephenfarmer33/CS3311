@@ -53,7 +53,7 @@ def login():
 
     return(render_template('login.html'))
 
-@app.route("/dashboard")
+@app.route("/activities")
 def Index():
     s = "Select * FROM cs3311.activities"
     cursor.execute(s)
@@ -102,9 +102,12 @@ def insert():
 
         return redirect(url_for('Index'))
 
-@app.route('/Change Page')
+@app.route('/projects')
 def change():
-    return render_template('index_project.html')
+    s = "Select * FROM cs3311.projects"
+    cursor.execute(s)
+    list_projects = cursor.fetchall()
+    return render_template("index_project.html", projects = list_projects)
 
 
 @app.route('/update', methods = ['GET', 'POST'])
