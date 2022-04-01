@@ -106,7 +106,7 @@ def get_latest_projectID():
     """
     gets latest projectID for indexing
     """
-    cursor.execute('SELECT COUNT(*) from projects;')
+    cursor.execute('SELECT MAX(ProjectID) from projects;')
     return cursor.fetchone()[0]
 
 connect()
