@@ -15,7 +15,7 @@ from mysql.connector import errorcode
 
 config = {
     'user': 'root',
-    'password': 'Sssugar200214890_^',
+    'password': '1100279464',
     'host': '127.0.0.1',
     'database': 'CS3311'
 }

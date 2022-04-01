@@ -17,8 +17,8 @@ app.secret_key = 'Secret Key'
 #DB_USER = 'cs3311_admin'
 #DB_PASS = 'password'
 config = {
-    'user': 'cs3311_admin',
-    'password': 'password',
+    'user': 'root',
+    'password': '1100279464',
     'host': '127.0.0.1',
     'database': 'CS3311'
 }

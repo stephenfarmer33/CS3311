@@ -334,6 +334,8 @@ def classify_files(path):
             categories[failed].append(os.path.basename(file_name))
             print(f"{os.path.basename(file_name)} failed to parse")
             print(e)
+            raise e
+
 
     print('------------')
     print(f"Valid: {categories[success]}")

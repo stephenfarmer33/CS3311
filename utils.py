@@ -99,7 +99,7 @@ def find_entry(workbook, string):
     header_row, num_rows, num_cols = 0, len(workbook), len(workbook.columns)
     for row in range(0, num_rows):
         for col in range(0, num_cols):
-            if string in workbook.iat[row, col]:
+            if not isinstance(workbook.iat[row, col], float) and string in workbook.iat[row, col]:
                 # print(workbook.iat[row, col])
                 return row, col
 
