@@ -242,19 +242,25 @@ def insert_acts_into_db(acts):
     :param acts: dictionary of activities (output of parse_activities())
     :return: bool if success
     """
-    # insert projects
-    project_title = None
-    state = None
-    budget_period = None
-    reporting_period = None
+    # handle duplicate file uploads
+    # print('---------------------')
+    print('Current files:', sql_connection.select('file_names'))
+    current_files = sql_connection.select('file_names')
+
+    for activity, values in acts.items():
+        file_name = values['file']
+        if file_name in current_files:
+            sql_connection.delete_duplicates(file_name)
+        break
+
     added_projects = set()
-    # insert activities
     
     for activity, values in acts.items():
         features = values['features']
         project_title = features['Project Title']
         state = values['state']
         budget_period = values['year']
+        file_name = values['file']
 
         # todo: parse datetime
         # add projects
@@ -266,7 +272,8 @@ def insert_acts_into_db(acts):
                 'State': state,
                 'Budget_Period_Start': '1998-01-01',
                 'Budget_Period_End': '1998-01-01',
-                'Reporting_Period': '1998-01-01'
+                'Reporting_Period': '1998-01-01',
+                'File_Name': file_name
             }]
             sql_connection.insert('projects', data)
 
