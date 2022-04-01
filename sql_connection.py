@@ -14,8 +14,8 @@ from mysql.connector import errorcode
 #    example code found at sql_test.py
 
 config = {
-    'user': 'root',
-    'password': '1100279464',
+    'user': 'cs3311_admin',
+    'password': 'password',
     'host': '127.0.0.1',
     'database': 'CS3311'
 }
@@ -24,11 +24,15 @@ cursor = None
 
 insert_query = {
     'projects': ("INSERT INTO projects "
-            "(Project, State, Budget_Period_Start, Budget_Period_End, Reporting_Period) "
-            "VALUES (%(Project)s, %(State)s, %(Budget_Period_Start)s, %(Budget_Period_End)s, %(Reporting_Period)s);"),
+            "(Project, State, Budget_Period_Start, Budget_Period_End, Reporting_Period, File_Name) "
+            "VALUES (%(Project)s, %(State)s, %(Budget_Period_Start)s, %(Budget_Period_End)s, %(Reporting_Period)s, %(File_Name)s);"),
     'activities': ("INSERT INTO activities "
             "(ProjectID, Activity, Description, Outcome, Output, Timeline, Statistics, Status, Successes, Challenges, CDC_Support_Needed, Parent_File) "
             "VALUES (%(ProjectID)s, %(Activity)s, %(Description)s, %(Outcome)s, %(Output)s, %(Timeline)s, %(Statistics)s, %(Status)s, %(Successes)s, %(Challenges)s, %(CDC_Support_Needed)s, %(Parent_File)s);")
+}
+
+select_query = {
+    'file_names': "select distinct File_Name from projects;",
 }
 
 def connect():
@@ -66,12 +70,26 @@ def insert(table, data):
     else:
         print('Invalid table selected for insertion')
 
-def query(table, query, data):
-    pass
+def select(query, data=None):
+    if query in select_query:
+        res = []
+        cursor.execute(select_query[query])
+        for d in cursor:
+            res.append(d[0])
+        return res
+    else:
+        print('Invalid query')
     
-
-def remove(table, data):
-    pass
+def delete_duplicates(file_name):
+    project_ids = []
+    print(file_name)
+    cursor.execute(f"SELECT ProjectID FROM projects WHERE File_Name = \'{file_name}\';")
+    for d in cursor:
+        project_ids.append(d[0])
+    print('project ids:', project_ids)
+    for id in project_ids:
+        cursor.execute(f"DELETE FROM activities WHERE ProjectID = \'{id}\'")
+        cursor.execute(f"DELETE FROM projects WHERE ProjectID = \'{id}\'")
 
 def close_connection():
     """
