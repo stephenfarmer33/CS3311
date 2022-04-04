@@ -304,7 +304,7 @@ def insert_acts_into_db(acts):
             'Successes': successes,
             'Challenges': challenges,
             'CDC_Support_Needed': CDC_Support_Needed,
-            'Parent_File' : 'sample parent file'
+            'Parent_File' : file_name
         }]
         for k in data[0]:
             if str(data[0][k]) == 'nan':
