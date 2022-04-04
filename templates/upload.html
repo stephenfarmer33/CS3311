@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %} Upload File {% endblock %}
+
+{% block body %}  
+
+                    {% with messages = get_flashed_messages() %}
+
+                    {% if messages %}
+
+                    {% for message in messages %}
+
+                    <div class = "alert alert-success alert-dismissable" role="alert">
+
+                        {{message}}
+
+                        <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close">
+
+                        </button>
+
+                        
+
+                    </div>
+
+                    {% endfor %}
+
+                    {% endif %}
+                    {% endwith %}
+
+    <h1>Upload File</h1>
+    <form method="POST" action="" enctype="multipart/form-data">
+      <p><input type="file" name="files[]" multiple="true" autocomplete="off"></p>
+      <p><input type="submit" value="Submit"></p>
+    </form>
+
+{% endblock %}

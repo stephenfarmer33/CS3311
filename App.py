@@ -1,7 +1,10 @@
 # from crypt import methods
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.utils import secure_filename
+from werkzeug.datastructures import  FileStorage
 import mysql.connector
+import pandas as pd
 
 
 app = Flask(__name__)
@@ -167,7 +170,35 @@ def delete(ActivityID):
     flash("Activity Deleted")
     return redirect(url_for('Index'))
 
+@app.route('/upload')
+def upload():
+    return render_template("upload.html")
 
+@app.route('/upload', methods=['POST']) 
+def upload_file():
+    if request.method == "POST":
+        if 'files[]' not in request.files:
+            flash('Files Not Available')
+            return redirect(url_for('upload'))
+        files = request.files.getlist('files[]')
+        for file in files:
+            #x1 = pd.ExcelFile(file, engine = "openpyxl")
+            #print(x1)
+            x2 = pd.read_excel(file, engine='openpyxl')
+            print(x2)
+            x2 = x2.to_html()
+            print(x2)
+
+            #data_xls = pd.read_excel(file, engine='openpyxl')
+            #print(data_xls)
+            #document = secure_filename(file.filename)
+        flash("File(s) Uploaded Succesfully")
+
+    ##f = request.files['file']
+    #f = request.files['file']
+    #f.save(secure_filename(f.filename))
+    
+    return redirect(url_for('upload'))
 
 
 if(__name__) == "__main__":
