@@ -1,16 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <title>CDC/NCEH Database</title>
+    
     <link type="text/css" href="{{url_for('static', filename = 'css/bootstrap.min.css')}}" rel="stylesheet"/>
     <link type="text/css" href="{{url_for('static', filename = 'css/dataTables.bootstrap5.min.css')}}" rel="stylesheet"/>
     <!--<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">-->
     
-
-    
-    <meta charset="UTF-8">
-    <title>{% block title %} {% endblock %}</title>
 </head>
 <body>
+
+    <div class="jumbotron p-3">
+        <div class="well text-center">
+            <h1>CDC/NCEH Database</h1>
+            <div class="child child3">
+                <ul class="nav nav-tabs nav-fill" style="background-color:rgb(25,135,84);">
+                    <li class="nav-item">
+                        <a class="nav-link" style="color:whitesmoke;" href="{{url_for('Index')}}">Activity</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" style="color:whitesmoke;" href="{{url_for('change')}}">Project</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" style="color:whitesmoke;" href="{{url_for('upload')}}">Upload</a>
+                    </li>
+                </ul>
+            </div>
+    
+    
+        </div>
+    
+    
+    </div>
 
 {% block body %} {% endblock %}
 
@@ -29,6 +51,21 @@
             "scrollY": "450px",
             "scrollCollapse": true,
             "scrollX": true,
+        });
+    } );
+
+</script>
+
+
+<script type="text/javascript">
+    if($.fn.DataTable.isDataTable('datatable2')) {
+        $('#datatable2').DataTable().destroy();
+        $('#datatable2').empty();
+    }
+
+    $(document).ready(function() {
+        $('#datatable2').DataTable( {
+            "bDestroy": true
         });
     } );
 

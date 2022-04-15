@@ -1,10 +1,26 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from click import password_option
+from flask import Flask, render_template, request, redirect, url_for, flash, session, g
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.utils import secure_filename
+from werkzeug.datastructures import  FileStorage
 import mysql.connector
+import pandas as pd
 
 
 app = Flask(__name__)
-app.secret_key = 'Secret Key'
+
+class User:
+    def __init__(self, id, user, password):
+        self.id = id
+        self.user = user
+        self.password = password
+
+users = []
+users.append(User(id = 1, user = 'cs3311_admin', password = 'password'))
+
+app.config['SECRET_KEY'] = 'SecretKey'
+
+
 #app.config['SQLALCHEMTY_DATABASE_URI'] = 'mysql://root:""@localhost/cs3311'
 #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -35,13 +51,44 @@ insert_query = {
 cnx = mysql.connector.connect(**config)
 cursor = cnx.cursor()
 
-@app.route("/")
+@app.before_request
+def before_request():
+    g.user = None
+    if 'user_id' in session:
+        user = [name for name in users if name.id == session['user_id']][0]
+        g.user = user
+    else:
+        g.user = None
+        
 
+@app.route('/')
+def entry():
+    return redirect(url_for('login'))
+
+@app.route('/login', methods = ["GET", "POST"])
+def login():
+    session.pop('user_id', None)
+    if request.method == 'POST':
+        session.pop('user_id', None)
+        username = request.form['username']
+        password = request.form['password']
+        user = [name for name in users if name.user == username][0]
+        if user and user.password == password:
+            session['user_id'] = user.id
+            return redirect(url_for('Index'))
+        return redirect(url_for('login'))
+
+    return(render_template('login.html'))
+
+@app.route("/activities")
 def Index():
+    if not g.user:
+        return redirect(url_for('login'))
     s = "Select * FROM cs3311.activities"
     cursor.execute(s)
     list_activities = cursor.fetchall()
     return render_template("Index.html", activities = list_activities)
+    
 
 @app.route('/insert', methods = ['POST'])
 def insert():
@@ -84,9 +131,14 @@ def insert():
 
         return redirect(url_for('Index'))
 
-@app.route('/Change Page')
+@app.route('/projects')
 def change():
-    return render_template('index_project.html')
+    if not g.user:
+        return redirect(url_for('login'))
+    s = "Select * FROM cs3311.projects"
+    cursor.execute(s)
+    list_projects = cursor.fetchall()
+    return render_template("index_project.html", projects = list_projects)
 
 
 @app.route('/update', methods = ['GET', 'POST'])
@@ -145,6 +197,38 @@ def delete(ActivityID):
     cnx.commit()
     flash("Activity Deleted")
     return redirect(url_for('Index'))
+
+@app.route('/upload')
+def upload():
+    if not g.user:
+        return redirect(url_for('login'))
+    return render_template("upload.html")
+
+@app.route('/upload', methods=['POST']) 
+def upload_file():
+    if request.method == "POST":
+        if 'files[]' not in request.files:
+            flash('Files Not Available')
+            return redirect(url_for('upload'))
+        files = request.files.getlist('files[]')
+        for file in files:
+            #x1 = pd.ExcelFile(file, engine = "openpyxl")
+            #print(x1)
+            x2 = pd.read_excel(file, engine='openpyxl')
+            print(x2)
+            x2 = x2.to_html()
+            print(x2)
+
+            #data_xls = pd.read_excel(file, engine='openpyxl')
+            #print(data_xls)
+            #document = secure_filename(file.filename)
+        flash("File(s) Uploaded Succesfully")
+
+    ##f = request.files['file']
+    #f = request.files['file']
+    #f.save(secure_filename(f.filename))
+    
+    return redirect(url_for('upload'))
 
 
 if(__name__) == "__main__":

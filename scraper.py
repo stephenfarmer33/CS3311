@@ -192,7 +192,7 @@ def parse_activities(file_name, file_type):
             # map activity feature
             header_map = {}
             headers = ["Project Title", "Activity Title", "Activity", "Activity Description", "Timeline", "Status",
-                       "Successes", "Challenges", "CDC Program Support Needed"]
+                       "Successes", "Challenges", "CDC Program Support Needed", "Short-Term Outcome", "Output"]
 
             for col in range(0, num_cols):
                 curr_header = workbook.iat[header_row, col]
@@ -244,7 +244,7 @@ def insert_acts_into_db(acts):
     """
     # handle duplicate file uploads
     # print('---------------------')
-    print('Current files:', sql_connection.select('file_names'))
+    #print('Current files:', sql_connection.select('file_names'))
     current_files = sql_connection.select('file_names')
 
     for activity, values in acts.items():
@@ -283,6 +283,8 @@ def insert_acts_into_db(acts):
         
         activity = features['Activity']
         description = features['Activity Description']
+        outcome = features['Short-Term Outcome']
+        output = features['Output']
         timeline = features['Timeline']
         status = features['Status']
         successes = features['Successes']
@@ -294,15 +296,15 @@ def insert_acts_into_db(acts):
             'ProjectID': latest_id,
             'Activity': activity,
             'Description': description,
-            'Outcome': 'sample outcome',
-            'Output' : 'sample output',
+            'Outcome': outcome,
+            'Output' : output,
             'Timeline': timeline,
             'Statistics': 'sample statistics',
             'Status': status,
             'Successes': successes,
             'Challenges': challenges,
             'CDC_Support_Needed': CDC_Support_Needed,
-            'Parent_File' : 'sample parent file'
+            'Parent_File' : file_name
         }]
         for k in data[0]:
             if str(data[0][k]) == 'nan':
