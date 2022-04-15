@@ -10,6 +10,7 @@ from tkinter import filedialog
 import time
 import threading
 import sql_connection
+from datetime import datetime
 
 # need xlrd version xlrd==1.2.0
 
@@ -262,7 +263,10 @@ def insert_acts_into_db(acts):
         budget_period = values['year']
         file_name = values['file']
 
-        # todo: parse datetime
+        budget_period_start, budget_period_end = budget_period.split(' - ', 2)
+        budget_period_start = datetime.strptime(budget_period_start, '%B %d, %Y')
+        budget_period_end = datetime.strptime(budget_period_end, '%B %d, %Y')
+        
         # add projects
         if project_title not in added_projects:
             added_projects.add(project_title)
@@ -270,9 +274,9 @@ def insert_acts_into_db(acts):
             data = [{
                 'Project': project_title,
                 'State': state,
-                'Budget_Period_Start': '1998-01-01',
-                'Budget_Period_End': '1998-01-01',
-                'Reporting_Period': '1998-01-01',
+                'Budget_Period_Start': budget_period_start,
+                'Budget_Period_End': budget_period_end,
+                'Reporting_Period': '2000-01-01',
                 'File_Name': file_name
             }]
             sql_connection.insert('projects', data)
