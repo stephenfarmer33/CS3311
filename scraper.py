@@ -351,17 +351,20 @@ def classify_files(path):
 
     return categories
 
+def close_connection():
+    sql_connection.close_connection()
+
 
 # New CMD Line argument main method
 # python3 scraper.py -f dummy
-def main():
-    data = main_screen()
-    GUI(data)
-    data.mainloop()
-    sql_connection.close_connection()
+#def main():
+    #data = main_screen()
+    #GUI(data)
+    #data.mainloop()
+#    sql_connection.close_connection()
     # folder = command_line_parsing()
     # classify_files(folder)
 
 
-if __name__ == "__main__":
-    main()
+#if __name__ == "__main__":
+#    main()
