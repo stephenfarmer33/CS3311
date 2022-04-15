@@ -1,5 +1,5 @@
-# from crypt import methods
-from flask import Flask, render_template, request, redirect, url_for, flash
+from click import password_option
+from flask import Flask, render_template, request, redirect, url_for, flash, session, g
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import  FileStorage
@@ -8,7 +8,19 @@ import pandas as pd
 
 
 app = Flask(__name__)
-app.secret_key = 'Secret Key'
+
+class User:
+    def __init__(self, id, user, password):
+        self.id = id
+        self.user = user
+        self.password = password
+
+users = []
+users.append(User(id = 1, user = 'cs3311_admin', password = 'password'))
+
+app.config['SECRET_KEY'] = 'SecretKey'
+
+
 #app.config['SQLALCHEMTY_DATABASE_URI'] = 'mysql://root:""@localhost/cs3311'
 #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -39,25 +51,39 @@ insert_query = {
 cnx = mysql.connector.connect(**config)
 cursor = cnx.cursor()
 
-tempUserName = 'cs3311_admin'
-tempPassword = 'password'
-loggedIn = False
+@app.before_request
+def before_request():
+    g.user = None
+    if 'user_id' in session:
+        user = [name for name in users if name.id == session['user_id']][0]
+        g.user = user
+    else:
+        g.user = None
+        
 
-@app.route("/")
+@app.route('/')
+def entry():
+    return redirect(url_for('login'))
+
 @app.route('/login', methods = ["GET", "POST"])
 def login():
-    loggedIn = False
+    session.pop('user_id', None)
     if request.method == 'POST':
-        name = request.form['username']
+        session.pop('user_id', None)
+        username = request.form['username']
         password = request.form['password']
-        if tempUserName == name and tempPassword == password:
-            loggedIn = True
+        user = [name for name in users if name.user == username][0]
+        if user and user.password == password:
+            session['user_id'] = user.id
             return redirect(url_for('Index'))
+        return redirect(url_for('login'))
 
     return(render_template('login.html'))
 
 @app.route("/activities")
 def Index():
+    if not g.user:
+        return redirect(url_for('login'))
     s = "Select * FROM cs3311.activities"
     cursor.execute(s)
     list_activities = cursor.fetchall()
@@ -107,6 +133,8 @@ def insert():
 
 @app.route('/projects')
 def change():
+    if not g.user:
+        return redirect(url_for('login'))
     s = "Select * FROM cs3311.projects"
     cursor.execute(s)
     list_projects = cursor.fetchall()
@@ -172,6 +200,8 @@ def delete(ActivityID):
 
 @app.route('/upload')
 def upload():
+    if not g.user:
+        return redirect(url_for('login'))
     return render_template("upload.html")
 
 @app.route('/upload', methods=['POST']) 
