@@ -263,12 +263,10 @@ def insert_acts_into_db(acts):
         budget_period = values['year']
         file_name = values['file']
 
-        
-        print(' 217638126837126416728948291498294')
         budget_period_start, budget_period_end = budget_period.split(' - ', 2)
         budget_period_start = datetime.strptime(budget_period_start, '%B %d, %Y')
         budget_period_end = datetime.strptime(budget_period_end, '%B %d, %Y')
-        print('budget period year:', budget_period_start)
+        
         # add projects
         if project_title not in added_projects:
             added_projects.add(project_title)
