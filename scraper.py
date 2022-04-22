@@ -264,8 +264,8 @@ def insert_acts_into_db(acts):
         file_name = values['file']
 
         budget_period_start, budget_period_end = budget_period.split(' - ', 2)
-        budget_period_start = datetime.strptime(budget_period_start, '%B %d, %Y')
-        budget_period_end = datetime.strptime(budget_period_end, '%B %d, %Y')
+        budget_period_start = datetime.strptime(budget_period_start.strip(), '%B %d, %Y')
+        budget_period_end = datetime.strptime(budget_period_end.strip(), '%B %d, %Y')
         
         # add projects
         if project_title not in added_projects:
@@ -363,14 +363,14 @@ def close_connection():
 
 # New CMD Line argument main method
 # python3 scraper.py -f dummy
-#def main():
-    #data = main_screen()
-    #GUI(data)
-    #data.mainloop()
-#    sql_connection.close_connection()
-    # folder = command_line_parsing()
-    # classify_files(folder)
+def main():
+    data = main_screen()
+    GUI(data)
+    data.mainloop()
+    sql_connection.close_connection()
+    folder = command_line_parsing()
+    classify_files(folder)
 
 
-#if __name__ == "__main__":
-#    main()
+if __name__ == "__main__":
+   main()
