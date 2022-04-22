@@ -109,6 +109,8 @@ def get_latest_projectID():
     gets latest projectID for indexing
     """
     cursor.execute('SELECT MAX(ProjectID) from projects;')
-    return cursor.fetchone()[0]
+    res = cursor.fetchone()
 
-#connect()
+    return res[0] if res[0] else 1
+
+connect()
