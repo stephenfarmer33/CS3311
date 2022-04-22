@@ -59,6 +59,10 @@ Use the following command to run the project:
 A link to a webpage should be generated. Open the link in your favorite browser to interact with the project. 
 
 # Interacting with the Webpage UI
+
+## Webpage Login
+
+## Uploading Documents
 To upload documents to the website to be parsed and subsequently inserted into the database, click the “Upload” button at the top right of the website.
 
 ![](images/upload.png)
@@ -74,14 +78,40 @@ option to browse through their files on their home computer and select the Excel
 
 Users will get a confirmation banner to indicate the files were successfully uploaded.
 
-## Webpage Login
-
-## Uploading Documents
-
 ## Query Documents
+The website has two tabs corresponding to the tables in the database. The “Activity” table, which can be reached from clicking the button on the top right called “Activity”, and the “Project” table, which can be reached from clicking the button in the middle called “Project”. Both the “Activity” page and “Project” hold the same functionality. Anything described as a function of the “Activity” page will as such work the same on the “Project” page.
+
+Upon landing on the Activity page, the table might look like the below image.
+
+![](images/activity.png)
+
+Here we can see many important functions. At the top left, the user can choose to show between 10 entries and 100 entries per page. The bottom left will inform the user how many entries there are total within the “Activities” table in the database. The bottom right numbers allows the user to switch between the several pages to search through the “Activities” table. 
+
+At the top right, below the “Add New Activities” button is the “Search” bar. This search bar is incredibly powerful and allows the user to query for any information they desire within the database. For example, if the user wants to find entries with information relating to “Grantee will complete the load”, if they search that exact phrase in the search bar, entries corresponding to that search phrase will be dynamically pulled up in the database.  
+
+![](images/activity_filtered.png)
+
+We can see from the image above that upon searching for the phrase, there is only one entry in the table that corresponds to it and the table dynamically shows those entries and filters out the other entries.
 
 ## Add Entries
+![](images/activity.png)
+The user may also manually add new entries to the “Activity” table if they desire. If the user clicks on the “Add New Activities” button on the top right, a window will pop-up allowing the user to fill in the information and “Submit” it to the table.
+
+![](images/add.png)
+
+See the above image for what this pop-up looks like. Upon filling out the information and clicking “Add Activity”, the entry will be added to the database.
 
 ## Delete And/Or Edit Entries
+![](images/extended.png)
 
+In the last column of the table, there are two actions the user can enact. “Edit”, to edit the information in the given table entry, and “Delete”, to delete the data entirely. Clicking on “Edit” will bring up a pop-up where the user can “Update” the information in the given entry. 
 
+The image to the bottom shows what this pop-up looks like. Upon changing some of the information in the pop-up and clicking “Update”, the changed information will be updated accordingly.
+
+![](images/edit.png)
+
+Upon clicking the “Delete” button, the user will be shown a pop-up asking the user to confirm the deletion. 
+
+![](images/delete.png)
+
+See the image above for how this will look like. Upon confirming, the given entry will be removed from the database entirely. 
