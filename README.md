@@ -61,6 +61,11 @@ A link to a webpage should be generated. Open the link in your favorite browser 
 # Interacting with the Webpage UI
 
 ## Webpage Login
+To log into the web page, enter a verified username and password combination into the respective boxes and click “Sign In”.
+
+![](images/login.png)
+
+If at any point a user navigates to the login page again, the session will end for that user, and it will request a new login to be inputted to start a new session.
 
 ## Uploading Documents
 To upload documents to the website to be parsed and subsequently inserted into the database, click the “Upload” button at the top right of the website.
