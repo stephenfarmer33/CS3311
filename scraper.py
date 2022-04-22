@@ -303,7 +303,7 @@ def insert_acts_into_db(acts):
             'Outcome': outcome,
             'Output' : output,
             'Timeline': timeline,
-            'Statistics': 'sample statistics',
+            'Statistics': None,
             'Status': status,
             'Successes': successes,
             'Challenges': challenges,

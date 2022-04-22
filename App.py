@@ -8,10 +8,10 @@ import pandas as pd
 import os
 import scraper
 import sql_connection
-
+from waitress import serve
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 * 200
+app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 * 2000
 app.config['UPLOAD_EXTENSIONS'] = ['.xsl', '.xlsx']
 upload_path = os.path.dirname(os.path.realpath(__file__)) + '\\uploads'
 app.config['UPLOAD_PATH'] = upload_path
@@ -164,9 +164,7 @@ def update():
         #cursor.execute(s)
         cursor.execute(query, (id, ))
         rel_activities = cursor.fetchall()
-        print(rel_activities)
         activityID = rel_activities[0][0]
-        print(activityID)
 
         activity = request.form['Activity']
         description = request.form['Description']
@@ -211,6 +209,19 @@ def delete(ActivityID):
     flash("Activity Deleted")
     return redirect(url_for('Index'))
 
+@app.route('/delete2/<ProjectID>/', methods = ['GET', 'POST'])
+def delete2(ProjectID):
+    sql = "DELETE FROM activities WHERE ProjectID = %s"
+    cursor.execute(sql, (ProjectID,))
+    cnx.commit()
+    sql = "DELETE FROM projects WHERE ProjectID = %s"
+    cursor.execute(sql, (ProjectID,))
+    cnx.commit()
+    flash("Project Deleted")
+    
+    return redirect(url_for('change'))
+
+
 @app.route('/upload')
 def upload():
     if not g.user:
@@ -228,9 +239,8 @@ def upload_file():
             filename = secure_filename(file.filename)
             if filename != ' ':
                 file_ext = os.path.splitext(filename)[1]
-                print(file_ext)
                 if file_ext not in app.config['UPLOAD_EXTENSIONS']:
-                    abort(400)
+                    continue
                 file.save(os.path.join(app.config['UPLOAD_PATH'], filename))
         scraper.classify_files(upload_path)
         #scraper.close_connection()
@@ -251,9 +261,19 @@ def upload_file():
     ##f = request.files['file']
     #f = request.files['file']
     #f.save(secure_filename(f.filename))
-    
+
+
+    for f in os.listdir(app.config['UPLOAD_PATH']):
+        os.remove(os.path.join(app.config['UPLOAD_PATH'],f))
+
     return redirect(url_for('upload'))
 
 
 if(__name__) == "__main__":
-    app.run(host='localhost', port=1000, debug=True)
+    #app.run(host='localhost', port=1000, debug=True)
+    serve(
+          app,
+          host = '127.0.0.1',
+          port=5000,
+          _quiet=True
+    )
