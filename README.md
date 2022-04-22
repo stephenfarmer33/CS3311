@@ -58,23 +58,30 @@ Use the following command to run the project:
 
 A link to a webpage should be generated. Open the link in your favorite browser to interact with the project. 
 
-
 # Interacting with the Webpage UI
+To upload documents to the website to be parsed and subsequently inserted into the database, click the “Upload” button at the top right of the website.
+
+![](images/upload.png)
+
+The user will land on the page above. 
+
+![](images/file.png)
+
+Upon clicking the “Browse…” button, users will have the
+option to browse through their files on their home computer and select the Excel file(s) they want to be parsed. Clicking “Open” will upload the files to the website. Then, clicking the “Submit” button will parse the documents and insert the data into the database. 
+
+![](images/banner.png)
+
+Users will get a confirmation banner to indicate the files were successfully uploaded.
 
 ## Webpage Login
 
 ## Uploading Documents
 
-### Uploading using Tinker UI
-
-### Uploading using Webpage (Preferred)
-
-
 ## Query Documents
 
-## Deletion 
+## Add Entries
 
-
-TBD: Details of how to add, delete, and query documents
+## Delete And/Or Edit Entries
 
 
