@@ -11,7 +11,7 @@ import sql_connection
 
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 * 20
+app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 * 200
 app.config['UPLOAD_EXTENSIONS'] = ['.xsl', '.xlsx']
 upload_path = os.path.dirname(os.path.realpath(__file__)) + '\\uploads'
 app.config['UPLOAD_PATH'] = upload_path
