@@ -1,13 +1,20 @@
 from click import password_option
-from flask import Flask, render_template, request, redirect, url_for, flash, session, g
+from flask import Flask, render_template, request, redirect, url_for, flash, session, g, abort
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import  FileStorage
 import mysql.connector
 import pandas as pd
+import os
+import scraper
+import sql_connection
 
 
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 * 20
+app.config['UPLOAD_EXTENSIONS'] = ['.xsl', '.xlsx']
+upload_path = os.path.dirname(os.path.realpath(__file__)) + '\\uploads'
+app.config['UPLOAD_PATH'] = upload_path
 
 class User:
     def __init__(self, id, user, password):
@@ -48,8 +55,9 @@ insert_query = {
             "VALUES (%(ProjectID)s, %(Activity)s, %(Description)s, %(Outcome)s, %(Output)s, %(Timeline)s, %(Statistics)s, %(Status)s, %(Successes)s, %(Challenges)s, %(CDC_Support_Needed)s, %(Parent_File)s);")
 }
 
-cnx = mysql.connector.connect(**config)
-cursor = cnx.cursor()
+#cnx = mysql.connector.connect(**config)
+#cursor = cnx.cursor()
+cursor, cnx = sql_connection.connect()
 
 @app.before_request
 def before_request():
@@ -84,9 +92,14 @@ def login():
 def Index():
     if not g.user:
         return redirect(url_for('login'))
+    #if(not cnx.is_connected()):
+    #    cnx = mysql.connector.connect(**config)
+    #    cursor = cnx.cursor()
     s = "Select * FROM cs3311.activities"
     cursor.execute(s)
     list_activities = cursor.fetchall()
+    #print(list_activities)
+    #cnx.close()
     return render_template("Index.html", activities = list_activities)
     
 
@@ -212,12 +225,23 @@ def upload_file():
             return redirect(url_for('upload'))
         files = request.files.getlist('files[]')
         for file in files:
+            filename = secure_filename(file.filename)
+            if filename != ' ':
+                file_ext = os.path.splitext(filename)[1]
+                print(file_ext)
+                if file_ext not in app.config['UPLOAD_EXTENSIONS']:
+                    abort(400)
+                file.save(os.path.join(app.config['UPLOAD_PATH'], filename))
+        scraper.classify_files(upload_path)
+        #scraper.close_connection()
+
+
             #x1 = pd.ExcelFile(file, engine = "openpyxl")
             #print(x1)
-            x2 = pd.read_excel(file, engine='openpyxl')
-            print(x2)
-            x2 = x2.to_html()
-            print(x2)
+            #x2 = pd.read_excel(file, engine='openpyxl')
+            #print(x2)
+            #x2 = x2.to_html()
+            #print(x2)
 
             #data_xls = pd.read_excel(file, engine='openpyxl')
             #print(data_xls)

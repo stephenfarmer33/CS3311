@@ -50,6 +50,8 @@ def connect():
 
     print('Database connection opened:', cnx)
     cursor = cnx.cursor()
+    return cursor, cnx
+    #return cnx, cursor
     
 # insert multiple rows?
 def insert(table, data):
@@ -109,4 +111,4 @@ def get_latest_projectID():
     cursor.execute('SELECT MAX(ProjectID) from projects;')
     return cursor.fetchone()[0]
 
-connect()
+#connect()

@@ -69,9 +69,9 @@ def get_state_and_plans(file_name, workbook):
     :return: tuple containing state, year
     """
     file_name = os.path.basename(file_name)
-    print(file_name)
+    file_name = str(file_name)
     state = file_name.split(" ")[0]
-    if len(state) == 1:
+    if len(file_name.split(" ")) == 1:
         state = file_name.split("_")[0]
 
     # convert full state name into abbrev
