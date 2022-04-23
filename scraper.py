@@ -276,7 +276,7 @@ def insert_acts_into_db(acts):
                 'State': state,
                 'Budget_Period_Start': budget_period_start,
                 'Budget_Period_End': budget_period_end,
-                'Reporting_Period': '2000-01-01',
+                'Reporting_Period': str(budget_period_start) + ' - ' + str(budget_period_end),
                 'File_Name': file_name
             }]
             sql_connection.insert('projects', data)
