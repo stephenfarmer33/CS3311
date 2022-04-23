@@ -164,6 +164,7 @@ def update():
         #cursor.execute(s)
         cursor.execute(query, (id, ))
         rel_activities = cursor.fetchall()
+        print("incorrect")
         activityID = rel_activities[0][0]
 
         activity = request.form['Activity']
@@ -200,6 +201,49 @@ def update():
         flash("Activity Updated Successfully")
 
         return redirect(url_for('Index'))
+
+@app.route('/update2', methods = ['GET', 'POST'])
+def update2():
+    if request.method == 'POST':
+        id = request.form.get('ProjectID')
+        query = "Select * FROM cs3311.projects WHERE ProjectID = %s"
+        cursor.execute(query, (id, ))
+        rel_projects = cursor.fetchall()
+       # print("correct1")
+        projectID = rel_projects[0][0]
+        
+
+        project = request.form['Project']
+        state = request.form['State']
+        budget_period_start = request.form['Budget_Period_Start']
+        
+        budget_period_end = request.form['Budget_Period_End']
+        #print("correct1.5")
+        reporting_period = request.form['Reporting_Period']
+        
+        file_name = request.form['File_Name']
+
+        #print("correct2")
+        sql = """
+        UPDATE projects
+        SET Project = %s,
+            State = %s,
+            Budget_Period_Start = %s,
+            Budget_Period_End = %s,
+            Reporting_Period = %s,
+            File_Name = %s
+        WHERE ProjectID = %s
+        """
+        #print("correct3")
+        cursor.execute(sql, (str(project), str(state), str(budget_period_start), str(budget_period_end), 
+                                str(reporting_period), str(file_name), projectID))
+        #print("correct4")
+        cnx.commit()
+        #print("correct5")
+        flash("Project Updated Successfully")
+        #print("correct6")
+
+        return redirect(url_for('change'))
 
 @app.route('/delete/<ActivityID>/', methods = ['GET', 'POST'])
 def delete(ActivityID):

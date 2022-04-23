@@ -47,7 +47,7 @@
                         <th>State</th>
                         <th>Budget Period Start</th>
                         <th>Budget Period End</th>
-                        <th>Reporting Period Start</th>
+                        <th>Reporting Period</th>
                         <th>File Name</th>
                         <th>Action</th>
     
@@ -62,11 +62,11 @@
                         <td>{{row[2]}}</td>
                         <td>{{row[3]}}</td>
                         <td>{{row[4]}}</td>
-                        <td>{{row[5]}}</td>
-                        <td>{{row[6]}}</td>  
+                        <td>{{row[5]}}</td> 
+                        <td>{{row[6]}}</td> 
 
                         <td>
-                            <a href="/update/{{row[0]}}" class="btn btn-warning btn-xs" data-bs-toggle="modal" data-bs-target="#modaledit{{row[0]}}">Edit</a>
+                            <a href="/update2/{{row[0]}}" class="btn btn-warning btn-xs" data-bs-toggle="modal" data-bs-target="#modaledit{{row[0]}}">Edit</a>
                             <a href="/delete2/{{row[0]}}" class="btn btn-danger btn-xs" onclick="return confirm('Do you want to delete?')">Delete</a>
                         </td>
 
@@ -82,7 +82,7 @@
                               </div>
                               <div class="modal-body">
                       
-                                 <form action="{{url_for('update')}}" method="POST">
+                                 <form action="{{url_for('update2')}}" method="POST">
                       
                       
                       
@@ -111,8 +111,8 @@
                                     <div class="form-group">
                       
                                         <label>Report:</label>
-                                        <input type="text" class="form-control" name="Reporting_Period_Start" value="{{row[5]}}">
-                                        <input type="text" class="form-control" name="Reporting_Period_End" value="{{row[6]}}">
+                                        <input type="text" class="form-control" name="Reporting_Period" value="{{row[5]}}">
+                                        <input type="text" class="form-control" name="File_Name" value="{{row[6]}}">
                        
                        
                                     </div>
@@ -207,20 +207,13 @@
 
                             <div class="form-group">
               
-                                <label>Reporting_Period_Start:</label>
-                                <input type="text" class="form-control" name="Reporting_Period_Start" required="1">
+                                <label>Reporting_Period:</label>
+                                <input type="text" class="form-control" name="Reporting_Period" required="1">
                
                
                             </div>
 
-                            <div class="form-group">
-              
-                                <label>Reporting_Period_End:</label>
-                                <input type="text" class="form-control" name="Reporting_Period_End" required="1">
-               
-               
-                            </div>
-
+                            
                             <div class="form-group">
               
                                 <label>Parent_File:</label>
