@@ -9,6 +9,7 @@ import os
 import scraper
 import sql_connection
 from waitress import serve
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 * 2000
@@ -144,6 +145,45 @@ def insert():
 
         return redirect(url_for('Index'))
 
+@app.route('/insert2', methods = ['POST'])
+def insert2():
+    #print("correct1")
+    if request.method =='POST':
+        #print("correct1")
+        project = request.form['Project']
+        #print("correct1.1")
+        state = request.form['State']
+        #print("correct1.3")
+        budget_period_start = request.form['Budget_Period_Start'] 
+        #print("correct1.6")
+        budget_period_end = request.form['Budget_Period_End']
+        #print("correct1.9")
+        reporting_period = request.form['Reporting_Period'] 
+        file_name = request.form['File_Name']
+        
+        table_projects = 'projects'
+        print("correct2")
+        data_projects = [{
+            'ProjectID': 700,
+            'Project': project,
+            'State': state,
+            'Budget_Period_Start': datetime.today().strftime("%Y-%m-%d"),
+            'Budget_Period_End' : datetime.today().strftime("%Y-%m-%d"),
+            'Reporting_Period': reporting_period,
+            'File_Name': file_name
+        }]
+        print("correct3")
+
+        if table_projects in insert_query:
+            print("correct4")
+            cursor.executemany(insert_query[table_projects], data_projects)
+            print("correct5")
+            cnx.commit()
+        print("correct6")
+        flash("Project Inserted Successfully")
+        print("correct7")
+        return redirect(url_for('change'))
+
 @app.route('/projects')
 def change():
     if not g.user:
@@ -209,21 +249,18 @@ def update2():
         query = "Select * FROM cs3311.projects WHERE ProjectID = %s"
         cursor.execute(query, (id, ))
         rel_projects = cursor.fetchall()
-       # print("correct1")
         projectID = rel_projects[0][0]
         
-
         project = request.form['Project']
         state = request.form['State']
         budget_period_start = request.form['Budget_Period_Start']
         
         budget_period_end = request.form['Budget_Period_End']
-        #print("correct1.5")
+       
         reporting_period = request.form['Reporting_Period']
         
         file_name = request.form['File_Name']
 
-        #print("correct2")
         sql = """
         UPDATE projects
         SET Project = %s,
@@ -234,15 +271,11 @@ def update2():
             File_Name = %s
         WHERE ProjectID = %s
         """
-        #print("correct3")
         cursor.execute(sql, (str(project), str(state), str(budget_period_start), str(budget_period_end), 
                                 str(reporting_period), str(file_name), projectID))
-        #print("correct4")
         cnx.commit()
-        #print("correct5")
+    
         flash("Project Updated Successfully")
-        #print("correct6")
-
         return redirect(url_for('change'))
 
 @app.route('/delete/<ActivityID>/', methods = ['GET', 'POST'])
