@@ -147,22 +147,15 @@ def insert():
 
 @app.route('/insert2', methods = ['POST'])
 def insert2():
-    #print("correct1")
     if request.method =='POST':
-        #print("correct1")
         project = request.form['Project']
-        #print("correct1.1")
         state = request.form['State']
-        #print("correct1.3")
         budget_period_start = request.form['Budget_Period_Start'] 
-        #print("correct1.6")
         budget_period_end = request.form['Budget_Period_End']
-        #print("correct1.9")
         reporting_period = request.form['Reporting_Period'] 
         file_name = request.form['File_Name']
         
         table_projects = 'projects'
-        print("correct2")
         data_projects = [{
             'ProjectID': 700,
             'Project': project,
@@ -172,16 +165,11 @@ def insert2():
             'Reporting_Period': reporting_period,
             'File_Name': file_name
         }]
-        print("correct3")
 
         if table_projects in insert_query:
-            print("correct4")
             cursor.executemany(insert_query[table_projects], data_projects)
-            print("correct5")
             cnx.commit()
-        print("correct6")
         flash("Project Inserted Successfully")
-        print("correct7")
         return redirect(url_for('change'))
 
 @app.route('/projects')
